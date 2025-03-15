@@ -5,51 +5,46 @@
  */
 
 #include "calculadora.h"
+#include <stdio.h>
 
-float *
-suma_1_svc(int arg1, int arg2,  struct svc_req *rqstp)
+float * suma_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
 {
 	static float  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = arg1 + arg2;
 
 	return &result;
 }
 
-float *
-resta_1_svc(int arg1, int arg2,  struct svc_req *rqstp)
+float * resta_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
 {
 	static float  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = arg1 - arg2;
 
 	return &result;
 }
 
-float *
-multiplicacion_1_svc(int arg1, int arg2,  struct svc_req *rqstp)
+float * multiplicacion_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
 {
 	static float  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = arg1 * arg2;
 
 	return &result;
 }
 
-float *
-division_1_svc(int arg1, int arg2,  struct svc_req *rqstp)
+float * division_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
 {
 	static float  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(arg2 == 0){
+		printf("Error: No se puede dividir por 0\n");
+		result = 0.0;
+	}
+	else{
+		result = arg1 / arg2;
+	}
 
 	return &result;
 }

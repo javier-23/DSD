@@ -15,26 +15,26 @@ extern "C" {
 
 
 struct suma_1_argument {
-	int arg1;
-	int arg2;
+	float arg1;
+	float arg2;
 };
 typedef struct suma_1_argument suma_1_argument;
 
 struct resta_1_argument {
-	int arg1;
-	int arg2;
+	float arg1;
+	float arg2;
 };
 typedef struct resta_1_argument resta_1_argument;
 
 struct multiplicacion_1_argument {
-	int arg1;
-	int arg2;
+	float arg1;
+	float arg2;
 };
 typedef struct multiplicacion_1_argument multiplicacion_1_argument;
 
 struct division_1_argument {
-	int arg1;
-	int arg2;
+	float arg1;
+	float arg2;
 };
 typedef struct division_1_argument division_1_argument;
 
@@ -43,17 +43,17 @@ typedef struct division_1_argument division_1_argument;
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define SUMA 1
-extern  float * suma_1(int , int , CLIENT *);
-extern  float * suma_1_svc(int , int , struct svc_req *);
+extern  float * suma_1(float , float , CLIENT *);
+extern  float * suma_1_svc(float , float , struct svc_req *);
 #define RESTA 2
-extern  float * resta_1(int , int , CLIENT *);
-extern  float * resta_1_svc(int , int , struct svc_req *);
+extern  float * resta_1(float , float , CLIENT *);
+extern  float * resta_1_svc(float , float , struct svc_req *);
 #define MULTIPLICACION 3
-extern  float * multiplicacion_1(int , int , CLIENT *);
-extern  float * multiplicacion_1_svc(int , int , struct svc_req *);
+extern  float * multiplicacion_1(float , float , CLIENT *);
+extern  float * multiplicacion_1_svc(float , float , struct svc_req *);
 #define DIVISION 4
-extern  float * division_1(int , int , CLIENT *);
-extern  float * division_1_svc(int , int , struct svc_req *);
+extern  float * division_1(float , float , CLIENT *);
+extern  float * division_1_svc(float , float , struct svc_req *);
 extern int calcprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */

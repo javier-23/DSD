@@ -2,9 +2,9 @@
 
 program CALCPROG {
     version CALCVER {
-        float SUMA(int, int) = 1;
-        float RESTA(int, int) = 2;
-        float MULTIPLICACION(int, int) = 3;
-        float DIVISION(int, int) = 4;
+        float SUMA(float, float) = 1;
+        float RESTA(float, float) = 2;
+        float MULTIPLICACION(float, float) = 3;
+        float DIVISION(float, float) = 4;
     } = 1;
 } = 0x20000199;

@@ -10,7 +10,7 @@
 static struct timeval TIMEOUT = { 25, 0 };
 
 float *
-suma_1(int arg1, int arg2,  CLIENT *clnt)
+suma_1(float arg1, float arg2,  CLIENT *clnt)
 {
 	suma_1_argument arg;
 	static float clnt_res;
@@ -27,7 +27,7 @@ suma_1(int arg1, int arg2,  CLIENT *clnt)
 }
 
 float *
-resta_1(int arg1, int arg2,  CLIENT *clnt)
+resta_1(float arg1, float arg2,  CLIENT *clnt)
 {
 	resta_1_argument arg;
 	static float clnt_res;
@@ -44,7 +44,7 @@ resta_1(int arg1, int arg2,  CLIENT *clnt)
 }
 
 float *
-multiplicacion_1(int arg1, int arg2,  CLIENT *clnt)
+multiplicacion_1(float arg1, float arg2,  CLIENT *clnt)
 {
 	multiplicacion_1_argument arg;
 	static float clnt_res;
@@ -61,7 +61,7 @@ multiplicacion_1(int arg1, int arg2,  CLIENT *clnt)
 }
 
 float *
-division_1(int arg1, int arg2,  CLIENT *clnt)
+division_1(float arg1, float arg2,  CLIENT *clnt)
 {
 	division_1_argument arg;
 	static float clnt_res;

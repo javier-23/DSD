@@ -5,65 +5,60 @@
  */
 
 #include "calculadora.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-
-void
-calcprog_1(char *host)
-{
+void calculadora (char *host, float arg1, char op, float arg2){
 	CLIENT *clnt;
-	float  *result_1;
-	int suma_1_arg1;
-	int suma_1_arg2;
-	float  *result_2;
-	int resta_1_arg1;
-	int resta_1_arg2;
-	float  *result_3;
-	int multiplicacion_1_arg1;
-	int multiplicacion_1_arg2;
-	float  *result_4;
-	int division_1_arg1;
-	int division_1_arg2;
-
-#ifndef	DEBUG
-	clnt = clnt_create (host, CALCPROG, CALCVER, "udp");
+	float  *result = NULL;
+	
+	clnt = clnt_create(host, CALCPROG, CALCVER, "udp");
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
 		exit (1);
 	}
-#endif	/* DEBUG */
 
-	result_1 = suma_1(suma_1_arg1, suma_1_arg2, clnt);
-	if (result_1 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
+	switch (op){ // Selecciona la operacion a realizar
+		case '+':
+			result = suma_1(arg1, arg2, clnt);
+			break;
+		case '-':
+			result = resta_1(arg1, arg2, clnt);
+			break;
+		case '*':
+			result = multiplicacion_1(arg1, arg2, clnt);
+			break;
+		case '/':
+			result = division_1(arg1, arg2, clnt);
+			break;
+		default:
+			printf("Operador invalido\n");
+			clnt_destroy(clnt);
+			break;
 	}
-	result_2 = resta_1(resta_1_arg1, resta_1_arg2, clnt);
-	if (result_2 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
+
+	if(result == NULL){
+		clnt_perror(clnt, "Error en la llamada RPC");
 	}
-	result_3 = multiplicacion_1(multiplicacion_1_arg1, multiplicacion_1_arg2, clnt);
-	if (result_3 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
+	else{
+		printf("Resultado: %f\n", *result);
 	}
-	result_4 = division_1(division_1_arg1, division_1_arg2, clnt);
-	if (result_4 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-#ifndef	DEBUG
-	clnt_destroy (clnt);
-#endif	 /* DEBUG */
+
 }
 
-
-int
-main (int argc, char *argv[])
-{
-	char *host;
-
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
+int main (int argc, char *argv[]){
+	
+	if (argc != 5){
+		printf ("Uso correcto: %s <host> <numero> <operador> <numero>\n", argv[0]);
 		exit (1);
 	}
-	host = argv[1];
-	calcprog_1 (host);
-exit (0);
+
+	char *host = argv[1];
+	float arg1 = atof(argv[2]);
+    char op = argv[3][0];
+    float arg2 = atof(argv[4]);
+
+	calculadora(host, arg1, op, arg2);
+	
+	exit (0);
 }

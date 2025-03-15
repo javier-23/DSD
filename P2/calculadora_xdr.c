@@ -8,9 +8,9 @@
 bool_t
 xdr_suma_1_argument (XDR *xdrs, suma_1_argument *objp)
 {
-	 if (!xdr_int (xdrs, &objp->arg1))
+	 if (!xdr_float (xdrs, &objp->arg1))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->arg2))
+	 if (!xdr_float (xdrs, &objp->arg2))
 		 return FALSE;
 	return TRUE;
 }
@@ -18,9 +18,9 @@ xdr_suma_1_argument (XDR *xdrs, suma_1_argument *objp)
 bool_t
 xdr_resta_1_argument (XDR *xdrs, resta_1_argument *objp)
 {
-	 if (!xdr_int (xdrs, &objp->arg1))
+	 if (!xdr_float (xdrs, &objp->arg1))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->arg2))
+	 if (!xdr_float (xdrs, &objp->arg2))
 		 return FALSE;
 	return TRUE;
 }
@@ -28,9 +28,9 @@ xdr_resta_1_argument (XDR *xdrs, resta_1_argument *objp)
 bool_t
 xdr_multiplicacion_1_argument (XDR *xdrs, multiplicacion_1_argument *objp)
 {
-	 if (!xdr_int (xdrs, &objp->arg1))
+	 if (!xdr_float (xdrs, &objp->arg1))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->arg2))
+	 if (!xdr_float (xdrs, &objp->arg2))
 		 return FALSE;
 	return TRUE;
 }
@@ -38,9 +38,9 @@ xdr_multiplicacion_1_argument (XDR *xdrs, multiplicacion_1_argument *objp)
 bool_t
 xdr_division_1_argument (XDR *xdrs, division_1_argument *objp)
 {
-	 if (!xdr_int (xdrs, &objp->arg1))
+	 if (!xdr_float (xdrs, &objp->arg1))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->arg2))
+	 if (!xdr_float (xdrs, &objp->arg2))
 		 return FALSE;
 	return TRUE;
 }

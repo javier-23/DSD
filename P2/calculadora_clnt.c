@@ -10,15 +10,13 @@
 static struct timeval TIMEOUT = { 25, 0 };
 
 float *
-suma_1(float arg1, float arg2,  CLIENT *clnt)
+suma_1(operands *argp, CLIENT *clnt)
 {
-	suma_1_argument arg;
 	static float clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	arg.arg1 = arg1;
-	arg.arg2 = arg2;
-	if (clnt_call (clnt, SUMA, (xdrproc_t) xdr_suma_1_argument, (caddr_t) &arg,
+	if (clnt_call (clnt, SUMA,
+		(xdrproc_t) xdr_operands, (caddr_t) argp,
 		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -27,15 +25,13 @@ suma_1(float arg1, float arg2,  CLIENT *clnt)
 }
 
 float *
-resta_1(float arg1, float arg2,  CLIENT *clnt)
+resta_1(operands *argp, CLIENT *clnt)
 {
-	resta_1_argument arg;
 	static float clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	arg.arg1 = arg1;
-	arg.arg2 = arg2;
-	if (clnt_call (clnt, RESTA, (xdrproc_t) xdr_resta_1_argument, (caddr_t) &arg,
+	if (clnt_call (clnt, RESTA,
+		(xdrproc_t) xdr_operands, (caddr_t) argp,
 		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -44,15 +40,13 @@ resta_1(float arg1, float arg2,  CLIENT *clnt)
 }
 
 float *
-multiplicacion_1(float arg1, float arg2,  CLIENT *clnt)
+multiplicacion_1(operands *argp, CLIENT *clnt)
 {
-	multiplicacion_1_argument arg;
 	static float clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	arg.arg1 = arg1;
-	arg.arg2 = arg2;
-	if (clnt_call (clnt, MULTIPLICACION, (xdrproc_t) xdr_multiplicacion_1_argument, (caddr_t) &arg,
+	if (clnt_call (clnt, MULTIPLICACION,
+		(xdrproc_t) xdr_operands, (caddr_t) argp,
 		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -61,16 +55,89 @@ multiplicacion_1(float arg1, float arg2,  CLIENT *clnt)
 }
 
 float *
-division_1(float arg1, float arg2,  CLIENT *clnt)
+division_1(operands *argp, CLIENT *clnt)
 {
-	division_1_argument arg;
 	static float clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	arg.arg1 = arg1;
-	arg.arg2 = arg2;
-	if (clnt_call (clnt, DIVISION, (xdrproc_t) xdr_division_1_argument, (caddr_t) &arg,
+	if (clnt_call (clnt, DIVISION,
+		(xdrproc_t) xdr_operands, (caddr_t) argp,
 		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+evaluar_expresion_1(char **argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, EVALUAR_EXPRESION,
+		(xdrproc_t) xdr_wrapstring, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+vector_calc *
+operaciones_vector_1(vector_operands *argp, CLIENT *clnt)
+{
+	static vector_calc clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, OPERACIONES_VECTOR,
+		(xdrproc_t) xdr_vector_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_vector_calc, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+producto_escalar_1(vector_operands *argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, PRODUCTO_ESCALAR,
+		(xdrproc_t) xdr_vector_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+matriz_calc *
+operaciones_matriz_1(matriz_operands *argp, CLIENT *clnt)
+{
+	static matriz_calc clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, OPERACIONES_MATRIZ,
+		(xdrproc_t) xdr_matriz_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_matriz_calc, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+matriz_calc *
+multiplicacion_matriz_1(matriz_operands *argp, CLIENT *clnt)
+{
+	static matriz_calc clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MULTIPLICACION_MATRIZ,
+		(xdrproc_t) xdr_matriz_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_matriz_calc, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

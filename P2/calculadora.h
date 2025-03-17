@@ -14,46 +14,76 @@ extern "C" {
 #endif
 
 
-struct suma_1_argument {
+struct operands {
 	float arg1;
 	float arg2;
 };
-typedef struct suma_1_argument suma_1_argument;
+typedef struct operands operands;
 
-struct resta_1_argument {
-	float arg1;
-	float arg2;
+struct vector_calc {
+	int n;
+	struct {
+		u_int datos_len;
+		float *datos_val;
+	} datos;
 };
-typedef struct resta_1_argument resta_1_argument;
+typedef struct vector_calc vector_calc;
 
-struct multiplicacion_1_argument {
-	float arg1;
-	float arg2;
+struct vector_operands {
+	vector_calc v1;
+	vector_calc v2;
+	char operador;
 };
-typedef struct multiplicacion_1_argument multiplicacion_1_argument;
+typedef struct vector_operands vector_operands;
 
-struct division_1_argument {
-	float arg1;
-	float arg2;
+struct matriz_calc {
+	int filas;
+	int columnas;
+	struct {
+		u_int datos_len;
+		float *datos_val;
+	} datos;
 };
-typedef struct division_1_argument division_1_argument;
+typedef struct matriz_calc matriz_calc;
+
+struct matriz_operands {
+	matriz_calc m1;
+	matriz_calc m2;
+	char operador;
+};
+typedef struct matriz_operands matriz_operands;
 
 #define CALCPROG 0x20000199
 #define CALCVER 1
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define SUMA 1
-extern  float * suma_1(float , float , CLIENT *);
-extern  float * suma_1_svc(float , float , struct svc_req *);
+extern  float * suma_1(operands *, CLIENT *);
+extern  float * suma_1_svc(operands *, struct svc_req *);
 #define RESTA 2
-extern  float * resta_1(float , float , CLIENT *);
-extern  float * resta_1_svc(float , float , struct svc_req *);
+extern  float * resta_1(operands *, CLIENT *);
+extern  float * resta_1_svc(operands *, struct svc_req *);
 #define MULTIPLICACION 3
-extern  float * multiplicacion_1(float , float , CLIENT *);
-extern  float * multiplicacion_1_svc(float , float , struct svc_req *);
+extern  float * multiplicacion_1(operands *, CLIENT *);
+extern  float * multiplicacion_1_svc(operands *, struct svc_req *);
 #define DIVISION 4
-extern  float * division_1(float , float , CLIENT *);
-extern  float * division_1_svc(float , float , struct svc_req *);
+extern  float * division_1(operands *, CLIENT *);
+extern  float * division_1_svc(operands *, struct svc_req *);
+#define EVALUAR_EXPRESION 5
+extern  float * evaluar_expresion_1(char **, CLIENT *);
+extern  float * evaluar_expresion_1_svc(char **, struct svc_req *);
+#define OPERACIONES_VECTOR 6
+extern  vector_calc * operaciones_vector_1(vector_operands *, CLIENT *);
+extern  vector_calc * operaciones_vector_1_svc(vector_operands *, struct svc_req *);
+#define PRODUCTO_ESCALAR 7
+extern  float * producto_escalar_1(vector_operands *, CLIENT *);
+extern  float * producto_escalar_1_svc(vector_operands *, struct svc_req *);
+#define OPERACIONES_MATRIZ 8
+extern  matriz_calc * operaciones_matriz_1(matriz_operands *, CLIENT *);
+extern  matriz_calc * operaciones_matriz_1_svc(matriz_operands *, struct svc_req *);
+#define MULTIPLICACION_MATRIZ 9
+extern  matriz_calc * multiplicacion_matriz_1(matriz_operands *, CLIENT *);
+extern  matriz_calc * multiplicacion_matriz_1_svc(matriz_operands *, struct svc_req *);
 extern int calcprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -69,22 +99,39 @@ extern  float * multiplicacion_1_svc();
 #define DIVISION 4
 extern  float * division_1();
 extern  float * division_1_svc();
+#define EVALUAR_EXPRESION 5
+extern  float * evaluar_expresion_1();
+extern  float * evaluar_expresion_1_svc();
+#define OPERACIONES_VECTOR 6
+extern  vector_calc * operaciones_vector_1();
+extern  vector_calc * operaciones_vector_1_svc();
+#define PRODUCTO_ESCALAR 7
+extern  float * producto_escalar_1();
+extern  float * producto_escalar_1_svc();
+#define OPERACIONES_MATRIZ 8
+extern  matriz_calc * operaciones_matriz_1();
+extern  matriz_calc * operaciones_matriz_1_svc();
+#define MULTIPLICACION_MATRIZ 9
+extern  matriz_calc * multiplicacion_matriz_1();
+extern  matriz_calc * multiplicacion_matriz_1_svc();
 extern int calcprog_1_freeresult ();
 #endif /* K&R C */
 
 /* the xdr functions */
 
 #if defined(__STDC__) || defined(__cplusplus)
-extern  bool_t xdr_suma_1_argument (XDR *, suma_1_argument*);
-extern  bool_t xdr_resta_1_argument (XDR *, resta_1_argument*);
-extern  bool_t xdr_multiplicacion_1_argument (XDR *, multiplicacion_1_argument*);
-extern  bool_t xdr_division_1_argument (XDR *, division_1_argument*);
+extern  bool_t xdr_operands (XDR *, operands*);
+extern  bool_t xdr_vector_calc (XDR *, vector_calc*);
+extern  bool_t xdr_vector_operands (XDR *, vector_operands*);
+extern  bool_t xdr_matriz_calc (XDR *, matriz_calc*);
+extern  bool_t xdr_matriz_operands (XDR *, matriz_operands*);
 
 #else /* K&R C */
-extern bool_t xdr_suma_1_argument ();
-extern bool_t xdr_resta_1_argument ();
-extern bool_t xdr_multiplicacion_1_argument ();
-extern bool_t xdr_division_1_argument ();
+extern bool_t xdr_operands ();
+extern bool_t xdr_vector_calc ();
+extern bool_t xdr_vector_operands ();
+extern bool_t xdr_matriz_calc ();
+extern bool_t xdr_matriz_operands ();
 
 #endif /* K&R C */
 

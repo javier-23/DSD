@@ -6,45 +6,173 @@
 
 #include "calculadora.h"
 #include <stdio.h>
+#include <string.h>
 
-float * suma_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
-{
+float * suma_1_svc(operands *args,  struct svc_req *rqstp){
 	static float  result;
 
-	result = arg1 + arg2;
+	result = args->arg1 + args->arg2;
 
 	return &result;
 }
 
-float * resta_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
-{
+float * resta_1_svc(operands *args,  struct svc_req *rqstp){
 	static float  result;
 
-	result = arg1 - arg2;
+	result = args->arg1 - args->arg2;
 
 	return &result;
 }
 
-float * multiplicacion_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
-{
+float * multiplicacion_1_svc(operands *args,  struct svc_req *rqstp){
 	static float  result;
 
-	result = arg1 * arg2;
+	result = args->arg1 * args->arg2;
 
 	return &result;
 }
 
-float * division_1_svc(float arg1, float arg2,  struct svc_req *rqstp)
-{
+float * division_1_svc(operands *args,  struct svc_req *rqstp){
 	static float  result;
 
-	if(arg2 == 0){
+	if(args->arg2 == 0){
 		printf("Error: No se puede dividir por 0\n");
 		result = 0.0;
 	}
 	else{
-		result = arg1 / arg2;
+		result = args->arg1 / args->arg2;
 	}
+
+	return &result;
+}
+
+//Suma y resta de vectores
+
+vector_calc *operaciones_vector_1_svc(vector_operands *args, struct svc_req *rqstp) {
+    
+	static vector_calc resultado;
+    vector_calc *v1 = &args->v1;
+    vector_calc *v2 = &args->v2;
+    char *operador = &args->operador;
+
+    if (v1->n != v2->n) {
+        resultado.n = 0; // Error: vectores de diferente tamaño
+		printf("Error: vectores de diferente tamaño\n");
+        return &resultado;
+    }
+    resultado.n = v1->n;
+    resultado.datos.datos_len = v1->n;
+    resultado.datos.datos_val = (float *) malloc(v1->n * sizeof(float)); // Reservar memoria para el vector resultado
+
+    for (int i = 0; i < v1->n; i++) {
+        if (strcmp(operador, "+") == 0) 
+            resultado.datos.datos_val[i] = v1->datos.datos_val[i] + v2->datos.datos_val[i];
+        else if (strcmp(operador, "-") == 0)
+            resultado.datos.datos_val[i] = v1->datos.datos_val[i] - v2->datos.datos_val[i];
+        else {
+            printf("Operador invalido\n");
+            resultado.n = 0;
+            return &resultado;
+        }
+    }
+    return &resultado;
+}
+
+//Producto escalar de vectores
+
+float * producto_escalar_1_svc(vector_operands *args, struct svc_req *rqstp) {
+    static float resultado;
+    vector_calc *v1 = &args->v1;
+    vector_calc *v2 = &args->v2;
+
+
+	if (v1->n != v2->n) {
+        printf("Error: vectores de diferente tamaño\n");
+		resultado = 0.0;
+        return &resultado;
+    }
+	
+    resultado = 0.0;
+    for (int i = 0; i < v1->n; i++) {
+        resultado += v1->datos.datos_val[i] * v2->datos.datos_val[i];
+    }
+    return &resultado;
+}
+
+
+matriz_calc * operaciones_matriz_1_svc(matriz_operands *args, struct svc_req *rqstp) {
+    static matriz_calc result;
+    
+	matriz_calc *m1 = &args->m1;
+    matriz_calc *m2 = &args->m2;
+	char *operador = &args->operador;
+
+	// Verificar que las matrices tengan las mismas dimensiones
+    if (m1->filas != m2->filas || m1->columnas != m2->columnas) {
+        printf("Error: Las matrices deben tener las mismas dimensiones\n");
+        result.filas = 0;
+        result.columnas = 0;
+        return &result;
+    }
+
+	// Inicializar la matriz resultado
+    result.filas = m1->filas;
+    result.columnas = m1->columnas;
+    result.datos.datos_len = m1->filas * m1->columnas;
+    result.datos.datos_val = (float *) malloc(result.datos.datos_len * sizeof(float));
+
+	for (int i = 0; i < m1->filas; i++) {
+		for (int j = 0; j < m1->columnas; j++) {
+			int index = i * m1->columnas + j;
+			if (strcmp(operador, "+") == 0) 
+				result.datos.datos_val[index] = m1->datos.datos_val[index] + m2->datos.datos_val[index];
+			else if (strcmp(operador, "-") == 0)
+				result.datos.datos_val[index] = m1->datos.datos_val[index] - m2->datos.datos_val[index];
+			else {
+				printf("Operador invalido\n");
+			}
+		}
+    }
+
+    return &result;
+}
+
+matriz_calc * multiplicacion_matriz_1_svc(matriz_operands *args, struct svc_req *rqstp) {
+    static matriz_calc result;
+    
+	matriz_calc *m1 = &args->m1;
+    matriz_calc *m2 = &args->m2;
+
+    // Verificar que el número de columnas de m1 sea igual al número de filas de m2
+    if (m1->columnas != m2->filas) {
+        printf("Error: El número de columnas de la primera matriz debe ser igual al número de filas de la segunda\n");
+        result.filas = 0;
+        result.columnas = 0;
+        return &result;
+    }
+
+    // Inicializar la matriz resultado
+    result.filas = m1->filas;
+    result.columnas = m2->columnas;
+    result.datos.datos_len = result.filas * result.columnas;
+    result.datos.datos_val = (float *) malloc(result.datos.datos_len * sizeof(float));
+
+    // Realizar la multiplicación
+    for (int i = 0; i < m1->filas; i++) {
+        for (int j = 0; j < m2->columnas; j++) {
+            float sum = 0.0;
+            for (int k = 0; k < m1->columnas; k++) {
+                sum += m1->datos.datos_val[i * m1->columnas + k] * m2->datos.datos_val[k * m2->columnas + j];
+            }
+            result.datos.datos_val[i * result.columnas + j] = sum;
+        }
+    }
+
+    return &result;
+}
+
+float * evaluar_expresion_1_svc(char **expresion,  struct svc_req *rqstp){
+	static float  result;
 
 	return &result;
 }

@@ -6,8 +6,10 @@
 #include "calculadora.h"
 
 bool_t
-xdr_suma_1_argument (XDR *xdrs, suma_1_argument *objp)
+xdr_operands (XDR *xdrs, operands *objp)
 {
+	register int32_t *buf;
+
 	 if (!xdr_float (xdrs, &objp->arg1))
 		 return FALSE;
 	 if (!xdr_float (xdrs, &objp->arg2))
@@ -16,31 +18,57 @@ xdr_suma_1_argument (XDR *xdrs, suma_1_argument *objp)
 }
 
 bool_t
-xdr_resta_1_argument (XDR *xdrs, resta_1_argument *objp)
+xdr_vector_calc (XDR *xdrs, vector_calc *objp)
 {
-	 if (!xdr_float (xdrs, &objp->arg1))
+	register int32_t *buf;
+
+	 if (!xdr_int (xdrs, &objp->n))
 		 return FALSE;
-	 if (!xdr_float (xdrs, &objp->arg2))
+	 if (!xdr_array (xdrs, (char **)&objp->datos.datos_val, (u_int *) &objp->datos.datos_len, 100,
+		sizeof (float), (xdrproc_t) xdr_float))
 		 return FALSE;
 	return TRUE;
 }
 
 bool_t
-xdr_multiplicacion_1_argument (XDR *xdrs, multiplicacion_1_argument *objp)
+xdr_vector_operands (XDR *xdrs, vector_operands *objp)
 {
-	 if (!xdr_float (xdrs, &objp->arg1))
+	register int32_t *buf;
+
+	 if (!xdr_vector_calc (xdrs, &objp->v1))
 		 return FALSE;
-	 if (!xdr_float (xdrs, &objp->arg2))
+	 if (!xdr_vector_calc (xdrs, &objp->v2))
+		 return FALSE;
+	 if (!xdr_char (xdrs, &objp->operador))
 		 return FALSE;
 	return TRUE;
 }
 
 bool_t
-xdr_division_1_argument (XDR *xdrs, division_1_argument *objp)
+xdr_matriz_calc (XDR *xdrs, matriz_calc *objp)
 {
-	 if (!xdr_float (xdrs, &objp->arg1))
+	register int32_t *buf;
+
+	 if (!xdr_int (xdrs, &objp->filas))
 		 return FALSE;
-	 if (!xdr_float (xdrs, &objp->arg2))
+	 if (!xdr_int (xdrs, &objp->columnas))
+		 return FALSE;
+	 if (!xdr_array (xdrs, (char **)&objp->datos.datos_val, (u_int *) &objp->datos.datos_len, 10000,
+		sizeof (float), (xdrproc_t) xdr_float))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
+xdr_matriz_operands (XDR *xdrs, matriz_operands *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_matriz_calc (xdrs, &objp->m1))
+		 return FALSE;
+	 if (!xdr_matriz_calc (xdrs, &objp->m2))
+		 return FALSE;
+	 if (!xdr_char (xdrs, &objp->operador))
 		 return FALSE;
 	return TRUE;
 }

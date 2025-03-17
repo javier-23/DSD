@@ -16,38 +16,19 @@
 #define SIG_PF void(*)(int)
 #endif
 
-static float *
-_suma_1 (suma_1_argument *argp, struct svc_req *rqstp)
-{
-	return (suma_1_svc(argp->arg1, argp->arg2, rqstp));
-}
-
-static float *
-_resta_1 (resta_1_argument *argp, struct svc_req *rqstp)
-{
-	return (resta_1_svc(argp->arg1, argp->arg2, rqstp));
-}
-
-static float *
-_multiplicacion_1 (multiplicacion_1_argument *argp, struct svc_req *rqstp)
-{
-	return (multiplicacion_1_svc(argp->arg1, argp->arg2, rqstp));
-}
-
-static float *
-_division_1 (division_1_argument *argp, struct svc_req *rqstp)
-{
-	return (division_1_svc(argp->arg1, argp->arg2, rqstp));
-}
-
 static void
 calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		suma_1_argument suma_1_arg;
-		resta_1_argument resta_1_arg;
-		multiplicacion_1_argument multiplicacion_1_arg;
-		division_1_argument division_1_arg;
+		operands suma_1_arg;
+		operands resta_1_arg;
+		operands multiplicacion_1_arg;
+		operands division_1_arg;
+		char *evaluar_expresion_1_arg;
+		vector_operands operaciones_vector_1_arg;
+		vector_operands producto_escalar_1_arg;
+		matriz_operands operaciones_matriz_1_arg;
+		matriz_operands multiplicacion_matriz_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -59,27 +40,57 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		return;
 
 	case SUMA:
-		_xdr_argument = (xdrproc_t) xdr_suma_1_argument;
+		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) _suma_1;
+		local = (char *(*)(char *, struct svc_req *)) suma_1_svc;
 		break;
 
 	case RESTA:
-		_xdr_argument = (xdrproc_t) xdr_resta_1_argument;
+		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) _resta_1;
+		local = (char *(*)(char *, struct svc_req *)) resta_1_svc;
 		break;
 
 	case MULTIPLICACION:
-		_xdr_argument = (xdrproc_t) xdr_multiplicacion_1_argument;
+		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) _multiplicacion_1;
+		local = (char *(*)(char *, struct svc_req *)) multiplicacion_1_svc;
 		break;
 
 	case DIVISION:
-		_xdr_argument = (xdrproc_t) xdr_division_1_argument;
+		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) _division_1;
+		local = (char *(*)(char *, struct svc_req *)) division_1_svc;
+		break;
+
+	case EVALUAR_EXPRESION:
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) evaluar_expresion_1_svc;
+		break;
+
+	case OPERACIONES_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_vector_operands;
+		_xdr_result = (xdrproc_t) xdr_vector_calc;
+		local = (char *(*)(char *, struct svc_req *)) operaciones_vector_1_svc;
+		break;
+
+	case PRODUCTO_ESCALAR:
+		_xdr_argument = (xdrproc_t) xdr_vector_operands;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) producto_escalar_1_svc;
+		break;
+
+	case OPERACIONES_MATRIZ:
+		_xdr_argument = (xdrproc_t) xdr_matriz_operands;
+		_xdr_result = (xdrproc_t) xdr_matriz_calc;
+		local = (char *(*)(char *, struct svc_req *)) operaciones_matriz_1_svc;
+		break;
+
+	case MULTIPLICACION_MATRIZ:
+		_xdr_argument = (xdrproc_t) xdr_matriz_operands;
+		_xdr_result = (xdrproc_t) xdr_matriz_calc;
+		local = (char *(*)(char *, struct svc_req *)) multiplicacion_matriz_1_svc;
 		break;
 
 	default:

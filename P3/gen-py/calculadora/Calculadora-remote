@@ -24,10 +24,13 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  i32 suma(i32 num1, i32 num2)')
-    print('  i32 resta(i32 num1, i32 num2)')
-    print('  i32 multiplicacion(i32 num1, i32 num2)')
-    print('  i32 division(i32 num1, i32 num2)')
+    print('  double suma(double num1, double num2)')
+    print('  double resta(double num1, double num2)')
+    print('  double multiplicacion(double num1, double num2)')
+    print('  double division(double num1, double num2)')
+    print('  i64 factorial(i32 n)')
+    print('  i64 mcd( numeros)')
+    print('  i64 mcm( numeros)')
     print('')
     sys.exit(0)
 
@@ -130,6 +133,24 @@ elif cmd == 'division':
         print('division requires 2 args')
         sys.exit(1)
     pp.pprint(client.division(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'factorial':
+    if len(args) != 1:
+        print('factorial requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.factorial(eval(args[0]),))
+
+elif cmd == 'mcd':
+    if len(args) != 1:
+        print('mcd requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.mcd(eval(args[0]),))
+
+elif cmd == 'mcm':
+    if len(args) != 1:
+        print('mcm requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.mcm(eval(args[0]),))
 
 else:
     print('Unrecognized method %s' % cmd)

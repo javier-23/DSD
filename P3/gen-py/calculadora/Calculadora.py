@@ -55,6 +55,30 @@ class Iface(object):
         """
         pass
 
+    def factorial(self, n):
+        """
+        Parameters:
+         - n
+
+        """
+        pass
+
+    def mcd(self, numeros):
+        """
+        Parameters:
+         - numeros
+
+        """
+        pass
+
+    def mcm(self, numeros):
+        """
+        Parameters:
+         - numeros
+
+        """
+        pass
+
 
 class Client(Iface):
     def __init__(self, iprot, oprot=None):
@@ -199,6 +223,102 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "division failed: unknown result")
 
+    def factorial(self, n):
+        """
+        Parameters:
+         - n
+
+        """
+        self.send_factorial(n)
+        return self.recv_factorial()
+
+    def send_factorial(self, n):
+        self._oprot.writeMessageBegin('factorial', TMessageType.CALL, self._seqid)
+        args = factorial_args()
+        args.n = n
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_factorial(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = factorial_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "factorial failed: unknown result")
+
+    def mcd(self, numeros):
+        """
+        Parameters:
+         - numeros
+
+        """
+        self.send_mcd(numeros)
+        return self.recv_mcd()
+
+    def send_mcd(self, numeros):
+        self._oprot.writeMessageBegin('mcd', TMessageType.CALL, self._seqid)
+        args = mcd_args()
+        args.numeros = numeros
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_mcd(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = mcd_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "mcd failed: unknown result")
+
+    def mcm(self, numeros):
+        """
+        Parameters:
+         - numeros
+
+        """
+        self.send_mcm(numeros)
+        return self.recv_mcm()
+
+    def send_mcm(self, numeros):
+        self._oprot.writeMessageBegin('mcm', TMessageType.CALL, self._seqid)
+        args = mcm_args()
+        args.numeros = numeros
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_mcm(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = mcm_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "mcm failed: unknown result")
+
 
 class Processor(Iface, TProcessor):
     def __init__(self, handler):
@@ -208,6 +328,9 @@ class Processor(Iface, TProcessor):
         self._processMap["resta"] = Processor.process_resta
         self._processMap["multiplicacion"] = Processor.process_multiplicacion
         self._processMap["division"] = Processor.process_division
+        self._processMap["factorial"] = Processor.process_factorial
+        self._processMap["mcd"] = Processor.process_mcd
+        self._processMap["mcm"] = Processor.process_mcm
         self._on_message_begin = None
 
     def on_message_begin(self, func):
@@ -322,6 +445,75 @@ class Processor(Iface, TProcessor):
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
+    def process_factorial(self, seqid, iprot, oprot):
+        args = factorial_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = factorial_result()
+        try:
+            result.success = self._handler.factorial(args.n)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("factorial", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_mcd(self, seqid, iprot, oprot):
+        args = mcd_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = mcd_result()
+        try:
+            result.success = self._handler.mcd(args.numeros)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("mcd", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_mcm(self, seqid, iprot, oprot):
+        args = mcm_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = mcm_result()
+        try:
+            result.success = self._handler.mcm(args.numeros)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("mcm", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
 # HELPER FUNCTIONS AND STRUCTURES
 
 
@@ -348,13 +540,13 @@ class suma_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.I32:
-                    self.num1 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num1 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
-                if ftype == TType.I32:
-                    self.num2 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num2 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -368,12 +560,12 @@ class suma_args(object):
             return
         oprot.writeStructBegin('suma_args')
         if self.num1 is not None:
-            oprot.writeFieldBegin('num1', TType.I32, 1)
-            oprot.writeI32(self.num1)
+            oprot.writeFieldBegin('num1', TType.DOUBLE, 1)
+            oprot.writeDouble(self.num1)
             oprot.writeFieldEnd()
         if self.num2 is not None:
-            oprot.writeFieldBegin('num2', TType.I32, 2)
-            oprot.writeI32(self.num2)
+            oprot.writeFieldBegin('num2', TType.DOUBLE, 2)
+            oprot.writeDouble(self.num2)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -394,8 +586,8 @@ class suma_args(object):
 all_structs.append(suma_args)
 suma_args.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'num1', None, None, ),  # 1
-    (2, TType.I32, 'num2', None, None, ),  # 2
+    (1, TType.DOUBLE, 'num1', None, None, ),  # 1
+    (2, TType.DOUBLE, 'num2', None, None, ),  # 2
 )
 
 
@@ -420,8 +612,8 @@ class suma_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 0:
-                if ftype == TType.I32:
-                    self.success = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.success = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -435,8 +627,8 @@ class suma_result(object):
             return
         oprot.writeStructBegin('suma_result')
         if self.success is not None:
-            oprot.writeFieldBegin('success', TType.I32, 0)
-            oprot.writeI32(self.success)
+            oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+            oprot.writeDouble(self.success)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -456,7 +648,7 @@ class suma_result(object):
         return not (self == other)
 all_structs.append(suma_result)
 suma_result.thrift_spec = (
-    (0, TType.I32, 'success', None, None, ),  # 0
+    (0, TType.DOUBLE, 'success', None, None, ),  # 0
 )
 
 
@@ -483,13 +675,13 @@ class resta_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.I32:
-                    self.num1 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num1 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
-                if ftype == TType.I32:
-                    self.num2 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num2 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -503,12 +695,12 @@ class resta_args(object):
             return
         oprot.writeStructBegin('resta_args')
         if self.num1 is not None:
-            oprot.writeFieldBegin('num1', TType.I32, 1)
-            oprot.writeI32(self.num1)
+            oprot.writeFieldBegin('num1', TType.DOUBLE, 1)
+            oprot.writeDouble(self.num1)
             oprot.writeFieldEnd()
         if self.num2 is not None:
-            oprot.writeFieldBegin('num2', TType.I32, 2)
-            oprot.writeI32(self.num2)
+            oprot.writeFieldBegin('num2', TType.DOUBLE, 2)
+            oprot.writeDouble(self.num2)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -529,8 +721,8 @@ class resta_args(object):
 all_structs.append(resta_args)
 resta_args.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'num1', None, None, ),  # 1
-    (2, TType.I32, 'num2', None, None, ),  # 2
+    (1, TType.DOUBLE, 'num1', None, None, ),  # 1
+    (2, TType.DOUBLE, 'num2', None, None, ),  # 2
 )
 
 
@@ -555,8 +747,8 @@ class resta_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 0:
-                if ftype == TType.I32:
-                    self.success = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.success = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -570,8 +762,8 @@ class resta_result(object):
             return
         oprot.writeStructBegin('resta_result')
         if self.success is not None:
-            oprot.writeFieldBegin('success', TType.I32, 0)
-            oprot.writeI32(self.success)
+            oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+            oprot.writeDouble(self.success)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -591,7 +783,7 @@ class resta_result(object):
         return not (self == other)
 all_structs.append(resta_result)
 resta_result.thrift_spec = (
-    (0, TType.I32, 'success', None, None, ),  # 0
+    (0, TType.DOUBLE, 'success', None, None, ),  # 0
 )
 
 
@@ -618,13 +810,13 @@ class multiplicacion_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.I32:
-                    self.num1 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num1 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
-                if ftype == TType.I32:
-                    self.num2 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num2 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -638,12 +830,12 @@ class multiplicacion_args(object):
             return
         oprot.writeStructBegin('multiplicacion_args')
         if self.num1 is not None:
-            oprot.writeFieldBegin('num1', TType.I32, 1)
-            oprot.writeI32(self.num1)
+            oprot.writeFieldBegin('num1', TType.DOUBLE, 1)
+            oprot.writeDouble(self.num1)
             oprot.writeFieldEnd()
         if self.num2 is not None:
-            oprot.writeFieldBegin('num2', TType.I32, 2)
-            oprot.writeI32(self.num2)
+            oprot.writeFieldBegin('num2', TType.DOUBLE, 2)
+            oprot.writeDouble(self.num2)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -664,8 +856,8 @@ class multiplicacion_args(object):
 all_structs.append(multiplicacion_args)
 multiplicacion_args.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'num1', None, None, ),  # 1
-    (2, TType.I32, 'num2', None, None, ),  # 2
+    (1, TType.DOUBLE, 'num1', None, None, ),  # 1
+    (2, TType.DOUBLE, 'num2', None, None, ),  # 2
 )
 
 
@@ -690,8 +882,8 @@ class multiplicacion_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 0:
-                if ftype == TType.I32:
-                    self.success = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.success = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -705,8 +897,8 @@ class multiplicacion_result(object):
             return
         oprot.writeStructBegin('multiplicacion_result')
         if self.success is not None:
-            oprot.writeFieldBegin('success', TType.I32, 0)
-            oprot.writeI32(self.success)
+            oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+            oprot.writeDouble(self.success)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -726,7 +918,7 @@ class multiplicacion_result(object):
         return not (self == other)
 all_structs.append(multiplicacion_result)
 multiplicacion_result.thrift_spec = (
-    (0, TType.I32, 'success', None, None, ),  # 0
+    (0, TType.DOUBLE, 'success', None, None, ),  # 0
 )
 
 
@@ -753,13 +945,13 @@ class division_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.I32:
-                    self.num1 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num1 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
-                if ftype == TType.I32:
-                    self.num2 = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.num2 = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -773,12 +965,12 @@ class division_args(object):
             return
         oprot.writeStructBegin('division_args')
         if self.num1 is not None:
-            oprot.writeFieldBegin('num1', TType.I32, 1)
-            oprot.writeI32(self.num1)
+            oprot.writeFieldBegin('num1', TType.DOUBLE, 1)
+            oprot.writeDouble(self.num1)
             oprot.writeFieldEnd()
         if self.num2 is not None:
-            oprot.writeFieldBegin('num2', TType.I32, 2)
-            oprot.writeI32(self.num2)
+            oprot.writeFieldBegin('num2', TType.DOUBLE, 2)
+            oprot.writeDouble(self.num2)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -799,8 +991,8 @@ class division_args(object):
 all_structs.append(division_args)
 division_args.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'num1', None, None, ),  # 1
-    (2, TType.I32, 'num2', None, None, ),  # 2
+    (1, TType.DOUBLE, 'num1', None, None, ),  # 1
+    (2, TType.DOUBLE, 'num2', None, None, ),  # 2
 )
 
 
@@ -825,8 +1017,8 @@ class division_result(object):
             if ftype == TType.STOP:
                 break
             if fid == 0:
-                if ftype == TType.I32:
-                    self.success = iprot.readI32()
+                if ftype == TType.DOUBLE:
+                    self.success = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             else:
@@ -840,8 +1032,8 @@ class division_result(object):
             return
         oprot.writeStructBegin('division_result')
         if self.success is not None:
-            oprot.writeFieldBegin('success', TType.I32, 0)
-            oprot.writeI32(self.success)
+            oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+            oprot.writeDouble(self.success)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -861,7 +1053,392 @@ class division_result(object):
         return not (self == other)
 all_structs.append(division_result)
 division_result.thrift_spec = (
-    (0, TType.I32, 'success', None, None, ),  # 0
+    (0, TType.DOUBLE, 'success', None, None, ),  # 0
+)
+
+
+class factorial_args(object):
+    """
+    Attributes:
+     - n
+
+    """
+
+
+    def __init__(self, n=None,):
+        self.n = n
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.I32:
+                    self.n = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('factorial_args')
+        if self.n is not None:
+            oprot.writeFieldBegin('n', TType.I32, 1)
+            oprot.writeI32(self.n)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(factorial_args)
+factorial_args.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'n', None, None, ),  # 1
+)
+
+
+class factorial_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.I64:
+                    self.success = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('factorial_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.I64, 0)
+            oprot.writeI64(self.success)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(factorial_result)
+factorial_result.thrift_spec = (
+    (0, TType.I64, 'success', None, None, ),  # 0
+)
+
+
+class mcd_args(object):
+    """
+    Attributes:
+     - numeros
+
+    """
+
+
+    def __init__(self, numeros=None,):
+        self.numeros = numeros
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.LIST:
+                    self.numeros = []
+                    (_etype3, _size0) = iprot.readListBegin()
+                    for _i4 in range(_size0):
+                        _elem5 = iprot.readI32()
+                        self.numeros.append(_elem5)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('mcd_args')
+        if self.numeros is not None:
+            oprot.writeFieldBegin('numeros', TType.LIST, 1)
+            oprot.writeListBegin(TType.I32, len(self.numeros))
+            for iter6 in self.numeros:
+                oprot.writeI32(iter6)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(mcd_args)
+mcd_args.thrift_spec = (
+    None,  # 0
+    (1, TType.LIST, 'numeros', (TType.I32, None, False), None, ),  # 1
+)
+
+
+class mcd_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.I64:
+                    self.success = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('mcd_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.I64, 0)
+            oprot.writeI64(self.success)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(mcd_result)
+mcd_result.thrift_spec = (
+    (0, TType.I64, 'success', None, None, ),  # 0
+)
+
+
+class mcm_args(object):
+    """
+    Attributes:
+     - numeros
+
+    """
+
+
+    def __init__(self, numeros=None,):
+        self.numeros = numeros
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.LIST:
+                    self.numeros = []
+                    (_etype10, _size7) = iprot.readListBegin()
+                    for _i11 in range(_size7):
+                        _elem12 = iprot.readI32()
+                        self.numeros.append(_elem12)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('mcm_args')
+        if self.numeros is not None:
+            oprot.writeFieldBegin('numeros', TType.LIST, 1)
+            oprot.writeListBegin(TType.I32, len(self.numeros))
+            for iter13 in self.numeros:
+                oprot.writeI32(iter13)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(mcm_args)
+mcm_args.thrift_spec = (
+    None,  # 0
+    (1, TType.LIST, 'numeros', (TType.I32, None, False), None, ),  # 1
+)
+
+
+class mcm_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.I64:
+                    self.success = iprot.readI64()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('mcm_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.I64, 0)
+            oprot.writeI64(self.success)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(mcm_result)
+mcm_result.thrift_spec = (
+    (0, TType.I64, 'success', None, None, ),  # 0
 )
 fix_spec(all_structs)
 del all_structs

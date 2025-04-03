@@ -16,23 +16,20 @@ else:
 from thrift.transport import TTransport, TSocket, TSSLSocket, THttpClient
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 
-from calculadora import Calculadora
-from calculadora.ttypes import *
+from calculadoraAvanzada import CalculadoraAvanzada
+from calculadoraAvanzada.ttypes import *
 
 if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('')
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  double suma(double num1, double num2)')
-    print('  double resta(double num1, double num2)')
-    print('  double multiplicacion(double num1, double num2)')
-    print('  double division(double num1, double num2)')
-    print('  i64 factorial(i32 n)')
-    print('  i64 mcd( numeros)')
-    print('  i64 mcm( numeros)')
-    print('   operacionVectores(string operacion,  v1,  v2)')
-    print('   operacionMatrices(string operacion,  m1,  m2)')
+    print('   sumaVectores( v1,  v2)')
+    print('   restaVectores( v1,  v2)')
+    print('  double productoEscalar( v1,  v2)')
+    print('   sumaMatrices( m1,  m2)')
+    print('   restaMatrices( m1,  m2)')
+    print('   multiplicarMatrices( m1,  m2)')
     print('')
     sys.exit(0)
 
@@ -109,62 +106,44 @@ else:
     else:
         transport = TTransport.TBufferedTransport(socket)
 protocol = TBinaryProtocol(transport)
-client = Calculadora.Client(protocol)
+client = CalculadoraAvanzada.Client(protocol)
 transport.open()
 
-if cmd == 'suma':
+if cmd == 'sumaVectores':
     if len(args) != 2:
-        print('suma requires 2 args')
+        print('sumaVectores requires 2 args')
         sys.exit(1)
-    pp.pprint(client.suma(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.sumaVectores(eval(args[0]), eval(args[1]),))
 
-elif cmd == 'resta':
+elif cmd == 'restaVectores':
     if len(args) != 2:
-        print('resta requires 2 args')
+        print('restaVectores requires 2 args')
         sys.exit(1)
-    pp.pprint(client.resta(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.restaVectores(eval(args[0]), eval(args[1]),))
 
-elif cmd == 'multiplicacion':
+elif cmd == 'productoEscalar':
     if len(args) != 2:
-        print('multiplicacion requires 2 args')
+        print('productoEscalar requires 2 args')
         sys.exit(1)
-    pp.pprint(client.multiplicacion(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.productoEscalar(eval(args[0]), eval(args[1]),))
 
-elif cmd == 'division':
+elif cmd == 'sumaMatrices':
     if len(args) != 2:
-        print('division requires 2 args')
+        print('sumaMatrices requires 2 args')
         sys.exit(1)
-    pp.pprint(client.division(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.sumaMatrices(eval(args[0]), eval(args[1]),))
 
-elif cmd == 'factorial':
-    if len(args) != 1:
-        print('factorial requires 1 args')
+elif cmd == 'restaMatrices':
+    if len(args) != 2:
+        print('restaMatrices requires 2 args')
         sys.exit(1)
-    pp.pprint(client.factorial(eval(args[0]),))
+    pp.pprint(client.restaMatrices(eval(args[0]), eval(args[1]),))
 
-elif cmd == 'mcd':
-    if len(args) != 1:
-        print('mcd requires 1 args')
+elif cmd == 'multiplicarMatrices':
+    if len(args) != 2:
+        print('multiplicarMatrices requires 2 args')
         sys.exit(1)
-    pp.pprint(client.mcd(eval(args[0]),))
-
-elif cmd == 'mcm':
-    if len(args) != 1:
-        print('mcm requires 1 args')
-        sys.exit(1)
-    pp.pprint(client.mcm(eval(args[0]),))
-
-elif cmd == 'operacionVectores':
-    if len(args) != 3:
-        print('operacionVectores requires 3 args')
-        sys.exit(1)
-    pp.pprint(client.operacionVectores(args[0], eval(args[1]), eval(args[2]),))
-
-elif cmd == 'operacionMatrices':
-    if len(args) != 3:
-        print('operacionMatrices requires 3 args')
-        sys.exit(1)
-    pp.pprint(client.operacionMatrices(args[0], eval(args[1]), eval(args[2]),))
+    pp.pprint(client.multiplicarMatrices(eval(args[0]), eval(args[1]),))
 
 else:
     print('Unrecognized method %s' % cmd)

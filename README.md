@@ -19,3 +19,4 @@ Realizar una calculadora distribuida, usando las funcionalidades de Apache Thrif
 El lenguaje que se utiliza es Python, y para la solución se han implementado un cliente y dos servidores, uno para las operaciones más sencillas,, el cual será el cliente del segundo, y el segundo servidor que hará las operaciones con vectores y matrices.
 </p>
 
+>[Código práctica](https://github.com/javier-23/DSD/tree/3647db5ecfaeb9fd5fbcd2207f9f9fafbe90f3f7/P3)

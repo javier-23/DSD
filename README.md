@@ -10,6 +10,18 @@ Implementación de programas distribuidos con llamadas a procedimientos remotos 
 La calculadora implementada resuelve operaciones básicas como suma, resta, multiplicación y división, y operaciones más complejas con vectores (suma, resta y producto escalar) y con matrices (suma, resta y multiplicación).
 </p>
 
-> [Código práctica](https://github.com/javier-23/DSD/tree/06ee78666559a2578d748e762c113f442b51fc67/P2 "Código práctica")
+> [Código práctica RPC](https://github.com/javier-23/DSD/tree/06ee78666559a2578d748e762c113f442b51fc67/P2 "Código práctica")
 
 ## 2️⃣ Práctica Apache Thrift
+<p align="justify">
+Realizar una calculadora distribuida, usando las funcionalidades de Apache Thrift, que realiza operaciones básicas, factorial, máximo común divisor entre cuatro números, mínimo común múltiplo entre cuatro números, operaciones con vectores (suma, resta y producto escalar) y matrices (suma, resta y multiplicación).
+
+El lenguaje que se utiliza es Python, y para la solución se han implementado un cliente y dos servidores, uno para las operaciones más sencillas,, el cual será el cliente del segundo, y el segundo servidor que hará las operaciones con vectores y matrices.
+</p>
+
+>[Código práctica Apache Thrift](https://github.com/javier-23/DSD/tree/3647db5ecfaeb9fd5fbcd2207f9f9fafbe90f3f7/P3)
+
+## 3️⃣ RMI (Remote Method Invocation)
+<p align="justify">
+  
+</p>

@@ -209,16 +209,30 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
         
         esperandoRespuesta = true;
         respuestaRecibida = false;
+
+        System.out.println("[Servidor " + idServidor + "] Solicitando acceso al recurso compartido...");
         
         try {
             // Solicitar acceso al otro servidor
             DonacionesInterfaz otroServidor = conectarConOtroServidor();
             otroServidor.solicitarAcceso(relojSolicitud, idServidor);
-            
+
+            // Esperar respuesta con timeout ***
+            int intentos = 0;
+            final int MAX_INTENTOS = 50; // 5 segundos máximo
+        
             // Esperar respuesta
-            while (!respuestaRecibida) {
+            while (!respuestaRecibida && intentos < MAX_INTENTOS) {
                 Thread.sleep(100);
+                intentos++; //
             }
+
+            //**
+            if (!respuestaRecibida) {
+                System.out.println("[Servidor " + idServidor + "] Timeout esperando respuesta. Asumiendo acceso.");
+            } else {
+             System.out.println("[Servidor " + idServidor + "] Respuesta recibida, acceso concedido.");
+            }//** 
             
             accediendoARecursoCompartido = true;
             esperandoRespuesta = false;
@@ -257,18 +271,18 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
         } else {
             // Poner en cola la respuesta para cuando liberemos el recurso
             new Thread(() -> {
-                while (accediendoARecursoCompartido || esperandoRespuesta) {
-                    try {
+                try{
+                    while (accediendoARecursoCompartido || esperandoRespuesta) {
                         Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
-                }
-                try {
-                    DonacionesInterfaz otroServidor = conectarConOtroServidor();
-                    otroServidor.responderSolicitud(relojLogico);
-                } catch (Exception e) {
-                    System.err.println("[Servidor " + idServidor + "] Error al responder solicitud: " + e.getMessage());
+                    try {
+                        DonacionesInterfaz otroServidor = conectarConOtroServidor();
+                        otroServidor.responderSolicitud(relojLogico);
+                    } catch (Exception e) {
+                        System.err.println("[Servidor " + this.idServidor + "] Error al responder solicitud: " + e.getMessage());
+                    }
+                } catch (InterruptedException e) {
+                    System.err.println("[Servidor " + this.idServidor + "] Error en la espera de respuesta: " + e.getMessage());
                 }
             }).start();
         }
@@ -278,12 +292,14 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
     public synchronized void liberarAcceso(int relojLiberacion, int idServidor) throws RemoteException {
         actualizarReloj(relojLiberacion);
         System.out.println("[Servidor " + this.idServidor + "] Servidor " + idServidor + " ha liberado el acceso.");
+
     }
     
     @Override
     public synchronized void responderSolicitud(int relojRespuesta) throws RemoteException {
         actualizarReloj(relojRespuesta);
-        respuestaRecibida = true;
+        System.out.println("[Servidor " + idServidor + "] Recibida respuesta de acceso al recurso.");
+        this.respuestaRecibida = true;
     }
     
     // Método para conectar con el otro servidor

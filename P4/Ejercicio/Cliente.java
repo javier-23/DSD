@@ -81,7 +81,6 @@ public class Cliente {
             Registry registry = LocateRegistry.getRegistry(ipServidor, puerto);
             servidor = (DonacionesInterfaz) registry.lookup(nombreServidor);
             Cliente.nombreServidor = nombreServidor;
-            System.out.println("Conectado al servidor: " + nombreServidor);
         } catch (Exception e) {
             System.err.println("Error al conectar con " + nombreServidor + ": " + e.getMessage());
         }
@@ -94,6 +93,7 @@ public class Cliente {
             System.out.println("Servidor: " + NOMBRES_SERVICIO[servidorAsignado]);
         } else {
             System.out.println("No registrado");
+            System.out.println("Servidor inicial: " + NOMBRES_SERVICIO[servidorActual]);
         }
         System.out.println("1. Registrarse");
         System.out.println("2. Realizar donación");

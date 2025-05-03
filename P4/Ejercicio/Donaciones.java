@@ -217,22 +217,12 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
             DonacionesInterfaz otroServidor = conectarConOtroServidor();
             otroServidor.solicitarAcceso(relojSolicitud, idServidor);
 
-            // Esperar respuesta con timeout ***
-            int intentos = 0;
-            final int MAX_INTENTOS = 50; // 5 segundos máximo
-        
             // Esperar respuesta
-            while (!respuestaRecibida && intentos < MAX_INTENTOS) {
+            while (!respuestaRecibida) {
                 Thread.sleep(100);
-                intentos++; //
             }
 
-            //**
-            if (!respuestaRecibida) {
-                System.out.println("[Servidor " + idServidor + "] Timeout esperando respuesta. Asumiendo acceso.");
-            } else {
              System.out.println("[Servidor " + idServidor + "] Respuesta recibida, acceso concedido.");
-            }//** 
             
             accediendoARecursoCompartido = true;
             esperandoRespuesta = false;
@@ -251,24 +241,37 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
             // Notificar liberación al otro servidor
             DonacionesInterfaz otroServidor = conectarConOtroServidor();
             otroServidor.liberarAcceso(relojLogico, idServidor);
+            System.out.println("[Servidor " + idServidor + "] Acceso al recurso compartido liberado.");
         } catch (Exception e) {
             System.err.println("[Servidor " + idServidor + "] Error al liberar acceso: " + e.getMessage());
         }
     }
     
     @Override
-    public synchronized void solicitarAcceso(int relojSolicitante, int idServidor) throws RemoteException {
+    public synchronized void solicitarAcceso(int relojSolicitante, int idServidorSolicitante) throws RemoteException {
         actualizarReloj(relojSolicitante);
+        
+        System.out.println("[Servidor " + this.idServidor + "] Recibida solicitud de acceso en exclusión mutua del servidor " + idServidorSolicitante);
         
         // Si no estamos accediendo o esperando, o si el reloj del solicitante es menor
         // (o igual pero con ID menor), respondemos inmediatamente
         if (!accediendoARecursoCompartido && !esperandoRespuesta) {
-            responderSolicitud(relojLogico);
-        } else if (esperandoRespuesta && 
+            try{
+                DonacionesInterfaz servidorSolicitante = conectarConOtroServidor();
+                servidorSolicitante.responderSolicitud(relojLogico);
+                System.out.println("[Servidor " + this.idServidor + "] Respuesta enviada correctamente");
+            }
+            catch (Exception e) {
+                System.err.println("[Servidor " + this.idServidor + "] Error al responder solicitud: " + e.getMessage());
+            }
+        } 
+        else if (esperandoRespuesta && 
                   (relojSolicitante < relojLogico || 
-                  (relojSolicitante == relojLogico && idServidor < this.idServidor))) {
+                  (relojSolicitante == relojLogico && idServidorSolicitante < this.idServidor))) {
+            System.out.println("[Servidor " + this.idServidor + "] Enviando respuesta por prioridad al servidor " + idServidorSolicitante);
             responderSolicitud(relojLogico);
-        } else {
+        } 
+        else {
             // Poner en cola la respuesta para cuando liberemos el recurso
             new Thread(() -> {
                 try{
@@ -276,8 +279,7 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
                         Thread.sleep(100);
                     }
                     try {
-                        DonacionesInterfaz otroServidor = conectarConOtroServidor();
-                        otroServidor.responderSolicitud(relojLogico);
+                        responderSolicitud(relojLogico);
                     } catch (Exception e) {
                         System.err.println("[Servidor " + this.idServidor + "] Error al responder solicitud: " + e.getMessage());
                     }

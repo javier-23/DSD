@@ -40,23 +40,32 @@ public class Cliente {
                 int opcion = Integer.parseInt(scanner.nextLine());
                 
                 switch (opcion) {
-                    case 1: // Registrarse
+                    case 1:
                         registrarEntidad();
                         break;
-                    case 2: // Hacer donación
+                    case 2:
                         asegurarConexionCorrecta(ipServidor);
                         realizarDonacion();
                         break;
-                    case 3: // Consultar total donado
+                    case 3:
                         asegurarConexionCorrecta(ipServidor);
                         consultarTotalDonado();
                         break;
-                    case 4: // Listar donantes
+                    case 4:
                         asegurarConexionCorrecta(ipServidor);
                         listarDonantes();
                         break;
-                    case 5: // Salir
+                    case 5:
+                        asegurarConexionCorrecta(ipServidor);
+                        verTopDonantes();
+                        break;
+                    case 6:
+                        asegurarConexionCorrecta(ipServidor);
+                        consultarPromedioDonaciones();
+                        break;
+                    case 0:
                         salir = true;
+                        System.out.println("Saliendo del sistema.");
                         break;
                     default:
                         System.out.println("Opción no válida.");
@@ -99,7 +108,9 @@ public class Cliente {
         System.out.println("2. Realizar donación");
         System.out.println("3. Consultar total donado");
         System.out.println("4. Listar donantes");
-        System.out.println("5. Salir");
+        System.out.println("5. Ver top donantes");
+        System.out.println("6. Consultar promedio de donaciones");
+        System.out.println("0. Salir");
         System.out.print("Seleccione una opción: ");
     }
     
@@ -210,4 +221,35 @@ public class Cliente {
             }
         }
     }
+
+    private static void verTopDonantes() {
+        try {
+            System.out.print("¿Cuántos top donantes desea ver? ");
+            int cantidad = scanner.nextInt();
+            scanner.nextLine(); // Consumir nueva línea
+            
+            List<String> topDonantes = servidor.obtenerTopDonantes(cantidad);
+            
+            System.out.println("\n===== TOP " + cantidad + " DONANTES =====");
+            for (int i = 0; i < topDonantes.size(); i++) {
+                System.out.println((i + 1) + ". " + topDonantes.get(i));
+            }
+            
+            if (topDonantes.isEmpty()) {
+                System.out.println("No hay donantes registrados aún.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener top donantes: " + e.getMessage());
+        }
+    }
+
+    private static void consultarPromedioDonaciones() {
+        try {
+            double promedio = servidor.obtenerPromedioDonadoPorEntidad();
+            System.out.println("\nPromedio de donaciones por entidad: " + promedio + "€");
+        } catch (Exception e) {
+            System.err.println("Error al consultar promedio: " + e.getMessage());
+        }
+    }
+
 }

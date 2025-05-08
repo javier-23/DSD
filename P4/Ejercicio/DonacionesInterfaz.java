@@ -3,6 +3,7 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 public interface DonacionesInterfaz extends Remote {
     
@@ -28,5 +29,11 @@ public interface DonacionesInterfaz extends Remote {
     void solicitarAcceso(int relojSolicitante, int idServidor) throws RemoteException;
     void liberarAcceso(int relojLiberacion, int idServidor) throws RemoteException;
     void responderSolicitud(int relojRespuesta) throws RemoteException;
+
+    // Nuevas funcionalidades
+    List<String> obtenerTopDonantes(int cantidadTop) throws RemoteException;
+    double obtenerPromedioDonadoPorEntidad() throws RemoteException;
+
+    Map<String, Double> getDonacionesPorEntidad() throws RemoteException;
 
 }

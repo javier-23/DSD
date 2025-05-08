@@ -35,6 +35,7 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
         accediendoARecursoCompartido = false;
         esperandoRespuesta = false;
         respuestaRecibida = false;
+
     }
     
     // Incrementa el reloj lógico al recibir un mensaje
@@ -268,8 +269,14 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
         else if (esperandoRespuesta && 
                   (relojSolicitante < relojLogico || 
                   (relojSolicitante == relojLogico && idServidorSolicitante < this.idServidor))) {
-            System.out.println("[Servidor " + this.idServidor + "] Enviando respuesta por prioridad al servidor " + idServidorSolicitante);
-            responderSolicitud(relojLogico);
+            try{
+                // Si el reloj del solicitante es menor, respondemos inmediatamente
+                DonacionesInterfaz servidorSolicitante = conectarConOtroServidor();
+                servidorSolicitante.responderSolicitud(relojLogico);
+                System.out.println("[Servidor " + this.idServidor + "] Respuesta enviada por prioridad al servidor " + idServidorSolicitante);
+            } catch (Exception e) {
+                System.err.println("[Servidor " + this.idServidor + "] Error al responder solicitud: " + e.getMessage());
+            }
         } 
         else {
             // Poner en cola la respuesta para cuando liberemos el recurso
@@ -279,7 +286,8 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
                         Thread.sleep(100);
                     }
                     try {
-                        responderSolicitud(relojLogico);
+                        DonacionesInterfaz servidorSolicitante = conectarConOtroServidor();
+                        servidorSolicitante.responderSolicitud(relojLogico);
                     } catch (Exception e) {
                         System.err.println("[Servidor " + this.idServidor + "] Error al responder solicitud: " + e.getMessage());
                     }
@@ -306,8 +314,95 @@ public class Donaciones extends UnicastRemoteObject implements DonacionesInterfa
     
     // Método para conectar con el otro servidor
     private DonacionesInterfaz conectarConOtroServidor() throws RemoteException, NotBoundException {
-        int puertoRMI = PUERTO_RMI + ((idServidor == 1) ? 1 : 0); // Si soy Servidor 1, conecto a puerto 1100, si soy Servidor 2, conecto a puerto 1099
+        // Si soy Servidor 1, conecto a puerto 1100, si soy Servidor 2, conecto a puerto 1099
+        int puertoRMI = PUERTO_RMI + ((idServidor == 1) ? 1 : 0);
         Registry registry = LocateRegistry.getRegistry(ipOtroServidor, puertoRMI);
         return (DonacionesInterfaz) registry.lookup(nombreServicioRemoto);
     }
+
+    //Nuevas funcionalidades:
+
+    @Override
+    public List<String> obtenerTopDonantes(int cantidadTop) throws RemoteException {
+        System.out.println("[Servidor " + idServidor + "] Solicitando top " + cantidadTop + " donantes");
+        
+        // Crear una lista de entidades con sus donaciones
+        List<Map.Entry<String, Double>> listaDonaciones = new ArrayList<>();
+        
+        // Añadir donantes locales
+        for (Map.Entry<String, Double> entrada : donacionesPorEntidad.entrySet()) {
+            if (entrada.getValue() > 0) {
+                listaDonaciones.add(entrada);
+            }
+        }
+        
+        try {
+            // Obtener donaciones del otro servidor
+            DonacionesInterfaz otroServidor = conectarConOtroServidor();
+            Map<String, Double> donacionesOtroServidor = otroServidor.getDonacionesPorEntidad();
+            
+            // Añadir donantes del otro servidor
+            for (Map.Entry<String, Double> entrada : donacionesOtroServidor.entrySet()) {
+                listaDonaciones.add(entrada);
+            }
+        } catch (Exception e) {
+            System.err.println("[Servidor " + idServidor + "] Error al obtener donaciones del otro servidor: " + e.getMessage());
+        }
+        
+        // Ordenar la lista por cantidad donada (de mayor a menor)
+        listaDonaciones.sort((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()));
+        
+        // Tomar solo los primeros 'cantidadTop'
+        List<String> resultado = new ArrayList<>();
+        for (int i = 0; i < Math.min(cantidadTop, listaDonaciones.size()); i++) {
+            resultado.add(listaDonaciones.get(i).getKey() + " (" + listaDonaciones.get(i).getValue() + "€)");
+        }
+        
+        return resultado;
+    }
+
+    @Override
+    public double obtenerPromedioDonadoPorEntidad() throws RemoteException {
+        System.out.println("[Servidor " + idServidor + "] Calculando promedio de donaciones por entidad");
+        
+        // Variables para almacenar totales
+        double totalDonaciones = subtotalDonaciones;
+        int totalEntidades = 0;
+        
+        // Contar entidades locales que han donado
+        for (double cantidad : donacionesPorEntidad.values()) {
+            if (cantidad > 0) {
+                totalEntidades++;
+            }
+        }
+        
+        try {
+            // Obtener datos del otro servidor
+            DonacionesInterfaz otroServidor = conectarConOtroServidor();
+            totalDonaciones += otroServidor.getSubtotalLocal();
+            
+            // Contar entidades del otro servidor que han donado
+            Map<String, Double> donacionesOtroServidor = otroServidor.getDonacionesPorEntidad();
+            for (double cantidad : donacionesOtroServidor.values()) {
+                if (cantidad > 0) {
+                    totalEntidades++;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[Servidor " + idServidor + "] Error al obtener datos del otro servidor: " + e.getMessage());
+        }
+        
+        // Calcular y devolver el promedio
+        if (totalEntidades == 0) {
+            return 0.0;
+        } else {
+            return totalDonaciones / totalEntidades;
+        }
+    }
+
+    @Override
+    public Map<String, Double> getDonacionesPorEntidad() throws RemoteException {
+        return new HashMap<>(donacionesPorEntidad);
+    }
+
 }

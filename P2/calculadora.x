@@ -35,12 +35,10 @@ program CALCPROG {
         float MULTIPLICACION(operands) = 3;
         float DIVISION(operands) = 4;
 
-        float EVALUAR_EXPRESION(string) = 5;
+        vector_calc OPERACIONES_VECTOR(vector_operands) = 5;
+        float PRODUCTO_ESCALAR(vector_operands) = 6;
 
-        vector_calc OPERACIONES_VECTOR(vector_operands) = 6;
-        float PRODUCTO_ESCALAR(vector_operands) = 7;
-
-        matriz_calc OPERACIONES_MATRIZ(matriz_operands) = 8;
-        matriz_calc MULTIPLICACION_MATRIZ(matriz_operands) = 9;
+        matriz_calc OPERACIONES_MATRIZ(matriz_operands) = 7;
+        matriz_calc MULTIPLICACION_MATRIZ(matriz_operands) = 8;
     } = 1;
 } = 0x20000199;

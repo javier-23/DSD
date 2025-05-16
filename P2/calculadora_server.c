@@ -170,9 +170,3 @@ matriz_calc * multiplicacion_matriz_1_svc(matriz_operands *args, struct svc_req 
 
     return &result;
 }
-
-float * evaluar_expresion_1_svc(char **expresion,  struct svc_req *rqstp){
-	static float  result;
-
-	return &result;
-}

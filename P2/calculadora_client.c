@@ -14,7 +14,7 @@ void calculadora_basica(char *host, float arg1, char op, float arg2){
 	CLIENT *clnt;
 	float  *result = NULL;
 	
-	clnt = clnt_create(host, CALCPROG, CALCVER, "udp");
+	clnt = clnt_create(host, CALCPROG, CALCVER, "udp"); // Crear cliente RPC
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
 		exit (1);

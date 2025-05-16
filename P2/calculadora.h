@@ -69,19 +69,16 @@ extern  float * multiplicacion_1_svc(operands *, struct svc_req *);
 #define DIVISION 4
 extern  float * division_1(operands *, CLIENT *);
 extern  float * division_1_svc(operands *, struct svc_req *);
-#define EVALUAR_EXPRESION 5
-extern  float * evaluar_expresion_1(char **, CLIENT *);
-extern  float * evaluar_expresion_1_svc(char **, struct svc_req *);
-#define OPERACIONES_VECTOR 6
+#define OPERACIONES_VECTOR 5
 extern  vector_calc * operaciones_vector_1(vector_operands *, CLIENT *);
 extern  vector_calc * operaciones_vector_1_svc(vector_operands *, struct svc_req *);
-#define PRODUCTO_ESCALAR 7
+#define PRODUCTO_ESCALAR 6
 extern  float * producto_escalar_1(vector_operands *, CLIENT *);
 extern  float * producto_escalar_1_svc(vector_operands *, struct svc_req *);
-#define OPERACIONES_MATRIZ 8
+#define OPERACIONES_MATRIZ 7
 extern  matriz_calc * operaciones_matriz_1(matriz_operands *, CLIENT *);
 extern  matriz_calc * operaciones_matriz_1_svc(matriz_operands *, struct svc_req *);
-#define MULTIPLICACION_MATRIZ 9
+#define MULTIPLICACION_MATRIZ 8
 extern  matriz_calc * multiplicacion_matriz_1(matriz_operands *, CLIENT *);
 extern  matriz_calc * multiplicacion_matriz_1_svc(matriz_operands *, struct svc_req *);
 extern int calcprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
@@ -99,19 +96,16 @@ extern  float * multiplicacion_1_svc();
 #define DIVISION 4
 extern  float * division_1();
 extern  float * division_1_svc();
-#define EVALUAR_EXPRESION 5
-extern  float * evaluar_expresion_1();
-extern  float * evaluar_expresion_1_svc();
-#define OPERACIONES_VECTOR 6
+#define OPERACIONES_VECTOR 5
 extern  vector_calc * operaciones_vector_1();
 extern  vector_calc * operaciones_vector_1_svc();
-#define PRODUCTO_ESCALAR 7
+#define PRODUCTO_ESCALAR 6
 extern  float * producto_escalar_1();
 extern  float * producto_escalar_1_svc();
-#define OPERACIONES_MATRIZ 8
+#define OPERACIONES_MATRIZ 7
 extern  matriz_calc * operaciones_matriz_1();
 extern  matriz_calc * operaciones_matriz_1_svc();
-#define MULTIPLICACION_MATRIZ 9
+#define MULTIPLICACION_MATRIZ 8
 extern  matriz_calc * multiplicacion_matriz_1();
 extern  matriz_calc * multiplicacion_matriz_1_svc();
 extern int calcprog_1_freeresult ();

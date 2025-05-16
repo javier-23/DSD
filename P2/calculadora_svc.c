@@ -24,7 +24,6 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		operands resta_1_arg;
 		operands multiplicacion_1_arg;
 		operands division_1_arg;
-		char *evaluar_expresion_1_arg;
 		vector_operands operaciones_vector_1_arg;
 		vector_operands producto_escalar_1_arg;
 		matriz_operands operaciones_matriz_1_arg;
@@ -61,12 +60,6 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
 		local = (char *(*)(char *, struct svc_req *)) division_1_svc;
-		break;
-
-	case EVALUAR_EXPRESION:
-		_xdr_argument = (xdrproc_t) xdr_wrapstring;
-		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) evaluar_expresion_1_svc;
 		break;
 
 	case OPERACIONES_VECTOR:

@@ -16,6 +16,7 @@ public interface DonacionesInterfaz extends Remote {
     //Consultas
     double consultarTotalDonado(String nombreEntidad) throws RemoteException;
     List<String> listadoDonantes(String nombreEntidad) throws RemoteException;
+    Map<String, Double> getDonacionesPorEntidad() throws RemoteException;
 
     // Métodos para comunicación entre servidores
     boolean verificarEntidadRegistrada(String nombreEntidad) throws RemoteException;
@@ -33,7 +34,5 @@ public interface DonacionesInterfaz extends Remote {
     // Nuevas funcionalidades
     List<String> obtenerTopDonantes(int cantidadTop) throws RemoteException;
     double obtenerPromedioDonadoPorEntidad() throws RemoteException;
-
-    Map<String, Double> getDonacionesPorEntidad() throws RemoteException;
 
 }

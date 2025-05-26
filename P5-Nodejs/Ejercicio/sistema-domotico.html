@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sistema Domótico</title>
+</head>
+<body>
+    
+    <header>
+    <h1>Sistema Domótico</h1>
+
+    <div class="boton-container">
+        <button id="mostrar-formulario" class="btn-inicial" type="button">Añadir Dispositivo</button>
+        <form id="form-nuevo-dispositivo" class="oculto">
+            <label for="nombre-dispositivo">Nombre:</label>
+            <input type="text" id="nombre-dispositivo" required><br>
+            
+            <label for="tipo-dispositivo">Tipo:</label>
+            <select id="tipo-dispositivo">
+                <option value="sensor">Sensor</option>
+                <option value="actuador">Actuador</option>
+            </select><br>
+            
+            <button type="submit">Añadir Dispositivo</button>
+        </form>
+    </div>
+    </header>
+
+    <div class="configuracion">
+            <h3>Configuración Sensores</h3>
+                <label for="umbral-temperatura">Umbral temperatura (°C):</label>
+                <input type="number" id="umbral-temp-min" min="15" max="35" placeholder="min">
+                <input type="number" id="umbral-temp-max" min="15" max="35" placeholder="max">
+
+                <label for="umbral-luminosidad">Umbral luminosidad (%):</label>
+                <input type="number" id="umbral-luminosidad" min="0" max="100" placeholder="max">
+
+            <button id="guardar-umbral">Guardar</button>
+    </div>
+    
+    <main class ="grid-container">
+
+        <div class="grid1">
+            <h2>Sensores</h2>
+            <form id="form-sensores">
+                <label for="luminosidad">Luminosidad:</label>
+                <input type="number" id="luminosidad" min="0" max="100"><br>
+                
+                <label for="temperatura">Temperatura:</label>
+                <input type="number" id="temperatura" min="15" max="35"><br>
+                
+                <button type="submit">Actualizar Sensores</button>
+            </form>
+        </div>
+
+        <div class="grid2">
+            <h2>Histórico de Eventos</h2>
+            <ul id="historico"></ul>
+        </div>
+
+        <div class="grid3">
+            <h2>Actuadores</h2>
+            <p>Persiana: <span id="estado-Persiana">Abierta</span></p>
+            <button id="cambiar-Persiana">Abrir/Cerrar Persiana</button>
+            <p>Aire Acondicionado: <span id="estado-Aire">Apagado</span></p>
+            <button id="cambiar-Aire">Encender/Apagar Aire</button>
+        </div>
+
+    </main>
+</body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        
+        const serviceURL = document.URL;
+        const socket = io(serviceURL);
+
+        // Actualizar estado inicial
+        socket.on('estado-inicial', (estado) => {
+
+            const estadoPersianaElement = document.getElementById('estado-Persiana');
+            const botonPersiana = document.getElementById('cambiar-Persiana');
+    
+            if (estadoPersianaElement) {
+                estadoPersianaElement.textContent = estado.Persiana;
+                if (estado.Persiana === 'Cerrada') {
+                    estadoPersianaElement.style.color = '#aa0000'; // Rojo
+                    botonPersiana.textContent = 'Abrir';
+                } else {
+                    estadoPersianaElement.style.color = '#0d8a00'; // Verde
+                    botonPersiana.textContent = 'Cerrar';
+                }
+            }
+            
+            const estadoAireElement = document.getElementById('estado-Aire');
+            const botonAire = document.getElementById('cambiar-Aire');
+            
+            if (estadoAireElement) {
+                estadoAireElement.textContent = estado.Aire;
+                if (estado.Aire === 'Encendido') {
+                    estadoAireElement.style.color = '#0d8a00'; // Verde
+                    botonAire.textContent = 'Apagar';
+                } else {
+                    estadoAireElement.style.color = '#aa0000'; // Rojo
+                    botonAire.textContent = 'Encender';
+                }
+            }
+            
+            // Revisar si hay dispositivos adicionales
+            Object.keys(estado).forEach(key => {
+                if (key !== 'luminosidad' && key !== 'temperatura' && key !== 'Persiana' && key !== 'Aire') {
+                    // Es un dispositivo adicional
+                    actualizarDispositivoAdicional(key, estado[key]);
+                }
+            });
+        });
+
+
+        // Actualizar la interfaz cuando cambia el estado de un actuador
+        socket.on('actualizacion-actuador', (data) => {
+            const { actuador, estadoNuevo } = data;
+            const elementoEstado = document.getElementById(`estado-${actuador}`);
+            const boton = document.getElementById(`cambiar-${actuador}`);
+            
+            if (elementoEstado) {
+                elementoEstado.textContent = estadoNuevo;
+                
+                // Cambiar el color según estado
+                if (estadoNuevo === 'Cerrada' || estadoNuevo === 'Apagado') {
+                    elementoEstado.style.color = '#aa0000'; // Rojo
+                    if (actuador === 'Persiana') {
+                        boton.textContent = 'Abrir';
+                    } else {
+                        boton.textContent = `Encender`;
+                    }
+                } else {
+                    elementoEstado.style.color = '#0d8a00'; // Verde
+                    if (actuador === 'Persiana') {
+                        boton.textContent = 'Cerrar';
+                    } else {
+                        boton.textContent = `Apagar`;
+                    }
+                }
+            }
+            
+            // También actualizar el histórico
+            const historico = document.getElementById('historico');
+            const item = document.createElement('li');
+            item.textContent = `${actuador}: ${estadoNuevo} (${new Date().toLocaleString()})`;
+            historico.appendChild(item);
+        });
+
+        // Actualizar histórico
+        socket.on('actualizacion', (data) => {
+            const historico = document.getElementById('historico');
+            const item = document.createElement('li');
+            item.textContent = `${data.tipo}: ${data.valor} (${new Date().toLocaleString()})`;
+            historico.appendChild(item);
+        });
+
+        // Mostrar alarmas
+        socket.on('alarma', (mensaje) => {
+            alert(mensaje);
+        });
+
+        // Manejar la notificación de nuevo dispositivo agregado
+        socket.on('dispositivo-agregado', (data) => {
+            const { tipo, nombre } = data;
+            
+            if (tipo === 'sensor') {
+                // Agregar nuevo sensor a la interfaz
+                const sensoresDiv = document.querySelector('.grid1');
+                const sensorForm = document.getElementById('form-sensores');
+                
+                const label = document.createElement('label');
+                label.textContent = `${nombre}:`;
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = nombre;
+                input.min = '-100';
+                input.max = '100';
+
+        
+                sensorForm.insertBefore(input, sensorForm.lastElementChild);
+                sensorForm.insertBefore(label, input);
+
+                const br = document.createElement('br');
+                sensorForm.insertBefore(br, sensorForm.lastElementChild);
+                
+                // Actualizar el manejador de eventos para incluir el nuevo sensor
+                actualizarManejadorSensores();
+                
+            } else if (tipo === 'actuador') {
+                // Agregar nuevo actuador a la interfaz
+                const actuadoresDiv = document.querySelector('.grid3');
+                
+                const p = document.createElement('p');
+                p.textContent = `${nombre}: `;
+                
+                const span = document.createElement('span');
+                span.id = `estado-${nombre}`;
+                span.textContent = 'Apagado';
+                span.style.color = '#aa0000';
+                
+                const boton = document.createElement('button');
+                boton.id = `cambiar-${nombre}`;
+                boton.textContent = `Encender`;
+                
+                // Agregar manejador de eventos para el nuevo botón
+                boton.addEventListener('click', () => {
+                    socket.emit('cambiar-actuador', { actuador: nombre });
+                });
+                
+                p.appendChild(span);
+                actuadoresDiv.appendChild(p);
+                actuadoresDiv.appendChild(boton);
+            }
+            
+            // Registrar en el histórico
+            const historico = document.getElementById('historico');
+            const item = document.createElement('li');
+            item.textContent = `Nuevo ${tipo} agregado: ${nombre} (${new Date().toLocaleString()})`;
+            historico.appendChild(item);
+        });
+
+        // Función para actualizar el manejador de eventos de sensores
+        function actualizarManejadorSensores() {
+            document.getElementById('form-sensores').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Obtener todos los inputs en el formulario
+                const inputs = document.getElementById('form-sensores').querySelectorAll('input[type="number"]');
+                
+                inputs.forEach(input => {
+                    if (input.value) {
+                        socket.emit('actualizar-sensor', { 
+                            tipo: input.id, 
+                            valor: parseInt(input.value) 
+                        });
+                    }
+                });
+            });
+        }
+
+        // Función para actualizar la representación de un dispositivo adicional
+        function actualizarDispositivoAdicional(nombre, valor) {
+            // Verificar si es un sensor o actuador basado en el tipo de valor
+            const esActuador = typeof valor === 'string';
+            
+            if (esActuador) {
+                // Es un actuador
+                const span = document.getElementById(`estado-${nombre}`);
+                const boton = document.getElementById(`cambiar-${nombre}`);
+                
+                if (span && boton) {
+                    span.textContent = valor;
+                    span.style.color = valor === 'Encendido' ? '#0d8a00' : '#aa0000';
+                    boton.textContent = valor === 'Encendido' ? `Apagar ${nombre}` : `Encender ${nombre}`;
+                }
+            }
+        }
+
+        // Mostrar/ocultar formulario para añadir dispositivos
+        const botonMostrar = document.getElementById('mostrar-formulario');
+        const formulario = document.getElementById('form-nuevo-dispositivo');
+        
+        botonMostrar.addEventListener('click', function() {
+            if (formulario.classList.contains('oculto')) {
+                formulario.classList.remove('oculto');
+                botonMostrar.textContent = 'Cancelar';
+            } else {
+                formulario.classList.add('oculto');
+                botonMostrar.textContent = 'Añadir Dispositivo';
+            }
+        });
+
+        // Configurar umbral de temperatura
+        document.getElementById('guardar-umbral').addEventListener('click', () => {
+            const tempMin = document.getElementById('umbral-temp-min').value;
+            const tempMax = document.getElementById('umbral-temp-max').value;
+            const lum = document.getElementById('umbral-luminosidad').value;
+
+            const umbrales = {
+                temperatura: {
+                    min: tempMin ? parseInt(tempMin) : null,
+                    max: tempMax ? parseInt(tempMax) : null
+                },
+                luminosidad: lum ? parseInt(lum) : null
+            };
+            
+            socket.emit('configurar-umbrales', umbrales);
+            alert('Umbrales guardados correctamente');
+        });
+
+        // Manejar actualizaciones de sensores
+        document.getElementById('form-sensores').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const luminosidad = document.getElementById('luminosidad').value;
+            const temperatura = document.getElementById('temperatura').value;
+            if (luminosidad) socket.emit('actualizar-sensor', { tipo: 'luminosidad', valor: parseInt(luminosidad) });
+            if (temperatura) socket.emit('actualizar-sensor', { tipo: 'temperatura', valor: parseInt(temperatura) });
+        });
+
+        // Manejar cambios en actuadores
+        document.getElementById('cambiar-Persiana').addEventListener('click', () => {
+            socket.emit('cambiar-actuador', { actuador: 'Persiana'});
+        });
+
+        document.getElementById('cambiar-Aire').addEventListener('click', () => {
+            socket.emit('cambiar-actuador', { actuador: 'Aire' });
+        });
+
+         // Manejar agregar nuevos dispositivos
+        document.getElementById('form-nuevo-dispositivo').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre-dispositivo').value;
+            const tipo = document.getElementById('tipo-dispositivo').value;
+            
+            if (nombre && tipo) {
+                socket.emit('nuevo-dispositivo', { nombre, tipo });
+                document.getElementById('nombre-dispositivo').value = ''; // Limpiar campo
+            }
+        });
+
+    </script>
+
+
+<!-- Estilos CSS -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #4759fc;
+            color: white;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        .boton-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            position: relative;
+            background-color: #f4f4f9;
+            box-shadow: none;
+        }
+
+        .btn-inicial{
+            margin: 0;
+        }
+
+        #form-nuevo-dispositivo {
+            position: absolute;
+            top: 100%;
+            right: 10px;
+            background-color: rgb(210, 210, 210);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            width: 250px;
+        }
+
+        #form-nuevo-dispositivo label, input, select, button {
+            margin-bottom: 10px;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        .configuracion {
+            padding: 10px;
+            width: 95%;
+        }
+
+        .configuracion h3 {
+            margin: 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .grid1 {
+            width: 90%;
+            height: auto;
+        }
+
+        .grid2{
+            width: 90%;
+            height: auto;
+            grid-column-start: 1;
+            grid-row-start: 2;
+        }
+
+        .grid3{
+            width: 90%;
+            height: auto;
+            grid-row: span 2 / span 2; /* Ocupa dos filas */
+            grid-column-start: 2;
+            grid-row-start: 1;
+        }
+
+        h2 {
+            color: #4759fc;
+        }
+
+        div {
+            margin: 10px auto;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        div h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4759fc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #6473fc;
+        }
+
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        span {
+            font-weight: bold;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #historico {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</html>

@@ -42,8 +42,18 @@ let umbrales = {
         min: 18,  // Valor por defecto
         max: 25   // Valor por defecto
     },
-    luminosidad: 80   // Valor por defecto
+    luminosidad: 80,
+    agua: 50  // Valor por defecto
     
+};
+
+let estado = {
+    luminosidad: 0,
+    temperatura: 0,
+    agua: 0,
+    Persiana: 'Abierta',
+    Aire: 'Apagado',
+    Aspersores: 'Apagado',
 };
 
 
@@ -52,13 +62,6 @@ MongoClient.connect(mongoUrl)
         const dbo = db.db(dbName);
         const collection = dbo.collection("dispositivos");
         const io = new Server(httpServer);
-
-        let estado = {
-            luminosidad: 0,
-            temperatura: 0,
-            Persiana: 'Abierta',
-            Aire: 'Apagado'
-        };
         
         io.sockets.on('connection', (client) => {
             
@@ -78,7 +81,7 @@ MongoClient.connect(mongoUrl)
                 collection.updateOne(
                     { tipo: 'umbrales' },
                     { $set: { valores: umbrales, timestamp: new Date() } },
-                    { upsert: true }
+                    { upsert: true } // Crear el documento si no existe
                 );
                 
                 // Notificar a todos los clientes
@@ -107,6 +110,17 @@ MongoClient.connect(mongoUrl)
                     // Enviar el mensaje a Telegram
                     bot.sendMessage(chatId, '💡 ALERTA: Persiana BAJADA por superar la luminosidad máxima');
                 }
+
+                // En el evento 'actualizar-sensor' del servidor
+                if (tipo === 'agua' && valor < umbrales.agua) {  // Si hay menos de 100ml de agua
+                    estado.Aspersores = 'Encendido';
+                    io.emit('actualizacion-actuador', { actuador: 'Aspersores', estadoNuevo: estado.Aspersores });
+                    io.emit('alarma', 'Nivel de agua bajo: Aspersores encendidos automáticamente');
+                    
+                    // Si tienes configurado Telegram
+                    bot.sendMessage(chatId, '💧 ALERTA: Nivel de agua bajo, aspersores activados');
+                }
+
                 if (tipo === 'temperatura' && valor < umbrales.temperatura.min) {
                     estado.Aire = 'Apagado';
                     io.emit('actualizacion-actuador', { actuador: 'Aire', estadoNuevo: estado.Aire });

@@ -29,11 +29,14 @@
     <div class="configuracion">
             <h3>Configuración Sensores</h3>
                 <label for="umbral-temperatura">Umbral temperatura (°C):</label>
-                <input type="number" id="umbral-temp-min" min="15" max="35" placeholder="min">
-                <input type="number" id="umbral-temp-max" min="15" max="35" placeholder="max">
+                <input type="number" id="umbral-temp-min" min="15" max="35" value="18" placeholder="min">
+                <input type="number" id="umbral-temp-max" min="15" max="35" value="25" placeholder="max">
 
                 <label for="umbral-luminosidad">Umbral luminosidad (%):</label>
-                <input type="number" id="umbral-luminosidad" min="0" max="100" placeholder="max">
+                <input type="number" id="umbral-luminosidad" min="0" max="100" value="80" placeholder="max">
+
+                <label for="umbral-agua">Umbral agua (ml):</label>
+                <input type="number" id="umbral-agua" min="0" max="1000" value="50" placeholder="min">
 
             <button id="guardar-umbral">Guardar</button>
     </div>
@@ -44,10 +47,13 @@
             <h2>Sensores</h2>
             <form id="form-sensores">
                 <label for="luminosidad">Luminosidad:</label>
-                <input type="number" id="luminosidad" min="0" max="100"><br>
+                <input type="number" id="luminosidad" min="0" max="100" placeholder="%"><br>
                 
                 <label for="temperatura">Temperatura:</label>
-                <input type="number" id="temperatura" min="15" max="35"><br>
+                <input type="number" id="temperatura" min="15" max="35" placeholder="ºC"><br>
+
+                <label for="agua">Agua:</label>
+                <input type="number" id="agua" min="0" max="500" placeholder="ml"><br>
                 
                 <button type="submit">Actualizar Sensores</button>
             </form>
@@ -61,9 +67,11 @@
         <div class="grid3">
             <h2>Actuadores</h2>
             <p>Persiana: <span id="estado-Persiana">Abierta</span></p>
-            <button id="cambiar-Persiana">Abrir/Cerrar Persiana</button>
+            <button id="cambiar-Persiana">Abrir/Cerrar</button>
             <p>Aire Acondicionado: <span id="estado-Aire">Apagado</span></p>
-            <button id="cambiar-Aire">Encender/Apagar Aire</button>
+            <button id="cambiar-Aire">Encender/Apagar</button>
+            <p>Aspersores <span id="estado-Aspersores">Apagado</span></p>
+            <button id="cambiar-Aspersores">Encender/Apagar</button>
         </div>
 
     </main>
@@ -106,7 +114,7 @@
                 }
             }
             
-            // Revisar si hay dispositivos adicionales
+            // Revisar si hay dispositivos adicionales ????
             Object.keys(estado).forEach(key => {
                 if (key !== 'luminosidad' && key !== 'temperatura' && key !== 'Persiana' && key !== 'Aire') {
                     // Es un dispositivo adicional
@@ -256,7 +264,7 @@
                 if (span && boton) {
                     span.textContent = valor;
                     span.style.color = valor === 'Encendido' ? '#0d8a00' : '#aa0000';
-                    boton.textContent = valor === 'Encendido' ? `Apagar ${nombre}` : `Encender ${nombre}`;
+                    boton.textContent = valor === 'Encendido' ? `Apagar` : `Encender`;
                 }
             }
         }
@@ -280,13 +288,15 @@
             const tempMin = document.getElementById('umbral-temp-min').value;
             const tempMax = document.getElementById('umbral-temp-max').value;
             const lum = document.getElementById('umbral-luminosidad').value;
+            const agua = document.getElementById('umbral-agua').value;  // Añade esta línea
 
             const umbrales = {
                 temperatura: {
                     min: tempMin ? parseInt(tempMin) : null,
                     max: tempMax ? parseInt(tempMax) : null
                 },
-                luminosidad: lum ? parseInt(lum) : null
+                luminosidad: lum ? parseInt(lum) : null,
+                agua: agua ? parseInt(agua) : null  // Añade esta línea
             };
             
             socket.emit('configurar-umbrales', umbrales);
@@ -298,8 +308,11 @@
             e.preventDefault();
             const luminosidad = document.getElementById('luminosidad').value;
             const temperatura = document.getElementById('temperatura').value;
+            const agua = document.getElementById('agua').value;
+
             if (luminosidad) socket.emit('actualizar-sensor', { tipo: 'luminosidad', valor: parseInt(luminosidad) });
             if (temperatura) socket.emit('actualizar-sensor', { tipo: 'temperatura', valor: parseInt(temperatura) });
+            if (agua) socket.emit('actualizar-sensor', { tipo: 'agua', valor: parseInt(agua) });
         });
 
         // Manejar cambios en actuadores
@@ -309,6 +322,10 @@
 
         document.getElementById('cambiar-Aire').addEventListener('click', () => {
             socket.emit('cambiar-actuador', { actuador: 'Aire' });
+        });
+
+        document.getElementById('cambiar-Aspersores').addEventListener('click', () => {
+            socket.emit('cambiar-actuador', { actuador: 'Aspersores' });
         });
 
          // Manejar agregar nuevos dispositivos

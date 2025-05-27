@@ -90,7 +90,7 @@ MongoClient.connect(mongoUrl)
 
             client.on('actualizar-sensor', (data) => {
                 const { tipo, valor } = data;
-                const timestamp = new Date();
+                const timestamp = new Date().toLocaleString();
 
                 // Actualizar estado
                 estado[tipo] = valor;
@@ -128,7 +128,7 @@ MongoClient.connect(mongoUrl)
 
                     // Enviar el mensaje a Telegram
                     bot.sendMessage(chatId, '⚠️ ALERTA: Aire acondicionado APAGADO por temperatura inferior');
-                }else if (tipo === 'temperatura' && valor > umbrales.temperatura.max) {
+                } else if (tipo === 'temperatura' && valor > umbrales.temperatura.max) {
                     estado.Aire = 'Encendido';
                     io.emit('actualizacion-actuador', { actuador: 'Aire', estadoNuevo: estado.Aire });
                     io.emit('alarma', 'Temperatura alta: Aire acondicionado encendido automáticamente');
@@ -160,13 +160,13 @@ MongoClient.connect(mongoUrl)
                 collection.insertOne({
                     dispositivo: actuador,
                     estado: estado[actuador],
-                    timestamp: new Date()
+                    timestamp: new Date().toLocaleString()
                 });
             });
 
             client.on('nuevo-dispositivo', (data) => {
                 const { tipo, nombre } = data;
-                const timestamp = new Date();
+                const timestamp = new Date().toLocaleString();
                 
                 // Agregar el nuevo dispositivo al estado
                 if (tipo === 'sensor') {

@@ -4,10 +4,14 @@ import { join } from 'node:path';
 import { Server } from 'socket.io';
 import {MongoClient } from 'mongodb';
 import TelegramBot from 'node-telegram-bot-api';
+import dotenv from 'dotenv';
+
+// Cargar variables de entorno desde el archivo .env
+dotenv.config();
 
 // Configuración del bot de Telegram
-const token = '7937316379:AAEriQWb76a5P4CB32XemkZkJa4fEKKrkH4'; // Reemplaza con tu token de BotFather
-const chatId = '1357496231'; // Reemplaza con tu chat ID o ID de grupo
+const token = process.env.TELEGRAM_TOKEN;
+const chatId = process.env.TELEGRAM_CHAT_ID;
 const bot = new TelegramBot(token, { polling: false });
 
 // Configuración del servidor HTTP

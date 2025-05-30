@@ -50,3 +50,49 @@ El cliente es un aplicación normal de Java que realiza las siguientes acciones:
 >[Servidor replicado de donaciones](https://github.com/javier-23/DSD/tree/701f26e3b44501268ee475bfc9def5dd24931953/P4/Ejercicio)
 
 </p>
+
+## 4️⃣ Node.js
+<p align="justify">
+En esta práctica tuve que hacer en primer lugar una serie de ejemplos ya implementados para trabajar con Node.js y aprender su funcionamiento. Algunos de estos se utilizarán diferentes herramientas que servirán para aprender a usarlas y utilizarlas en el ejercicio final, como son Socket.io y MongoDB.
+
+>[Ejemplos](https://github.com/javier-23/DSD/tree/701f26e3b44501268ee475bfc9def5dd24931953/P5-Nodejs/Ejemplos)
+
+Para el ejercicio final se implementará un sistema domótico, el cual tiene las siguientes funcionalidades:
+- Está compuesto de tres sensores (luminosidad, temperatura y agua).
+- Sus respectivos actuadores: persianas, aire acondicionado y aspersores.
+- Un servidor que muestra las páginas para mostrar el estado y actaur sobre los elementos.
+- Un agente para notificar alarmas y tomar decisiones.
+
+En concreto, el sistema se comporta de la siguiente manera:
+
+#### Sensores y Simulación
+- Los sensores (temperatura, luminosidad, agua) difunden información a través del servidor
+- Las mediciones se simulan mediante un formulario web
+- Cada nueva medida genera un evento en tiempo real
+
+#### Servidor
+- Proporciona la interfaz web para control y simulación
+- Gestiona las suscripciones de usuarios y del agente automático
+- Almacena un historial de eventos con marcas temporales en MongoDB
+- Mantiene el estado actual del sistema
+
+#### Interfaz de Usuario
+- Muestra en tiempo real las medidas de los sensores
+- Presenta el historial de eventos y notificaciones
+- Permite control manual de actuadores (persianas, aire acondicionado, aspersores)
+- Permite configurar umbrales para las automatizaciones
+
+#### Agente
+Implementa las siguientes reglas:
+
+- Luminosidad alta → Cierra automáticamente la persiana
+- Temperatura baja → Apaga el aire acondicionado
+- Temperatura alta → Enciende el aire acondicionado
+- Nivel de agua bajo → Activa los aspersores
+
+El sistema utiliza comunicación en tiempo real mediante Socket.IO, permitiendo que todos los dispositivos conectados reciban actualizaciones instantáneas y que el agente responda inmediatamente a los cambios en las condiciones monitorizadas.
+
+Además hace uso de un bot de Telegram para que cada vez que salta una alarma, llega un mensaje a un chat creado con el bot.
+
+</p>
+

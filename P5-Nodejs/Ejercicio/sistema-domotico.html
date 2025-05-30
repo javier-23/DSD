@@ -70,7 +70,7 @@
             <button id="cambiar-Persiana">Abrir/Cerrar</button>
             <p>Aire Acondicionado: <span id="estado-Aire">Apagado</span></p>
             <button id="cambiar-Aire">Encender/Apagar</button>
-            <p>Aspersores <span id="estado-Aspersores">Apagado</span></p>
+            <p>Aspersores: <span id="estado-Aspersores">Apagado</span></p>
             <button id="cambiar-Aspersores">Encender/Apagar</button>
         </div>
 
@@ -114,13 +114,20 @@
                 }
             }
             
-            // Revisar si hay dispositivos adicionales ????
-            Object.keys(estado).forEach(key => {
-                if (key !== 'luminosidad' && key !== 'temperatura' && key !== 'Persiana' && key !== 'Aire') {
-                    // Es un dispositivo adicional
-                    actualizarDispositivoAdicional(key, estado[key]);
+            const estadoAspersoresElement = document.getElementById('estado-Aspersores');
+            const botonAspersores = document.getElementById('cambiar-Aspersores');
+    
+            if (estadoAspersoresElement) {
+                estadoAspersoresElement.textContent = estado.Aspersores;
+                if (estado.Aspersores === 'Apagado') {
+                    estadoAspersoresElement.style.color = '#aa0000'; // Rojo
+                    botonAspersores.textContent = 'Encender';
+                } else {
+                    estadoAspersoresElement.style.color = '#0d8a00'; // Verde
+                    botonAspersores.textContent = 'Apagar';
                 }
-            });
+            }
+
         });
 
 
@@ -158,7 +165,7 @@
             historico.appendChild(item);
         });
 
-        // Actualizar histórico
+        // Actualizar histórico (tipo, valor, fecha)
         socket.on('actualizacion', (data) => {
             const historico = document.getElementById('historico');
             const item = document.createElement('li');
@@ -177,7 +184,6 @@
             
             if (tipo === 'sensor') {
                 // Agregar nuevo sensor a la interfaz
-                const sensoresDiv = document.querySelector('.grid1');
                 const sensorForm = document.getElementById('form-sensores');
                 
                 const label = document.createElement('label');
@@ -189,15 +195,11 @@
                 input.min = '-100';
                 input.max = '100';
 
-        
                 sensorForm.insertBefore(input, sensorForm.lastElementChild);
                 sensorForm.insertBefore(label, input);
 
                 const br = document.createElement('br');
                 sensorForm.insertBefore(br, sensorForm.lastElementChild);
-                
-                // Actualizar el manejador de eventos para incluir el nuevo sensor
-                actualizarManejadorSensores();
                 
             } else if (tipo === 'actuador') {
                 // Agregar nuevo actuador a la interfaz
@@ -232,43 +234,6 @@
             historico.appendChild(item);
         });
 
-        // Función para actualizar el manejador de eventos de sensores
-        function actualizarManejadorSensores() {
-            document.getElementById('form-sensores').addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                // Obtener todos los inputs en el formulario
-                const inputs = document.getElementById('form-sensores').querySelectorAll('input[type="number"]');
-                
-                inputs.forEach(input => {
-                    if (input.value) {
-                        socket.emit('actualizar-sensor', { 
-                            tipo: input.id, 
-                            valor: parseInt(input.value) 
-                        });
-                    }
-                });
-            });
-        }
-
-        // Función para actualizar la representación de un dispositivo adicional
-        function actualizarDispositivoAdicional(nombre, valor) {
-            // Verificar si es un sensor o actuador basado en el tipo de valor
-            const esActuador = typeof valor === 'string';
-            
-            if (esActuador) {
-                // Es un actuador
-                const span = document.getElementById(`estado-${nombre}`);
-                const boton = document.getElementById(`cambiar-${nombre}`);
-                
-                if (span && boton) {
-                    span.textContent = valor;
-                    span.style.color = valor === 'Encendido' ? '#0d8a00' : '#aa0000';
-                    boton.textContent = valor === 'Encendido' ? `Apagar` : `Encender`;
-                }
-            }
-        }
-
         // Mostrar/ocultar formulario para añadir dispositivos
         const botonMostrar = document.getElementById('mostrar-formulario');
         const formulario = document.getElementById('form-nuevo-dispositivo');
@@ -288,7 +253,7 @@
             const tempMin = document.getElementById('umbral-temp-min').value;
             const tempMax = document.getElementById('umbral-temp-max').value;
             const lum = document.getElementById('umbral-luminosidad').value;
-            const agua = document.getElementById('umbral-agua').value;  // Añade esta línea
+            const agua = document.getElementById('umbral-agua').value;
 
             const umbrales = {
                 temperatura: {
@@ -296,7 +261,7 @@
                     max: tempMax ? parseInt(tempMax) : null
                 },
                 luminosidad: lum ? parseInt(lum) : null,
-                agua: agua ? parseInt(agua) : null  // Añade esta línea
+                agua: agua ? parseInt(agua) : null
             };
             
             socket.emit('configurar-umbrales', umbrales);

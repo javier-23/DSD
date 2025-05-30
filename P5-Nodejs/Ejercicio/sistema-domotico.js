@@ -80,6 +80,8 @@ MongoClient.connect(mongoUrl)
                     umbrales.temperatura.max = nuevosUmbrales.temperatura.max;
                 if (nuevosUmbrales.luminosidad !== null) 
                     umbrales.luminosidad = nuevosUmbrales.luminosidad;
+                if (nuevosUmbrales.agua !== null)
+                    umbrales.agua = nuevosUmbrales.agua;
                 
                 // Guardar en la base de datos
                 collection.updateOne(
@@ -99,11 +101,11 @@ MongoClient.connect(mongoUrl)
                 // Actualizar estado
                 estado[tipo] = valor;
 
-                // Guardar evento en la base de datos
+                // Guardar en la base de datos
                 collection.insertOne({ tipo, valor, timestamp });
 
                 // Notificar a todos los clientes
-                io.emit('actualizacion', { tipo, valor, timestamp });
+                io.emit('actualizacion', { tipo, valor });
 
                 // Lógica del agente
                 if (tipo === 'luminosidad' && valor > umbrales.luminosidad) {
@@ -116,12 +118,12 @@ MongoClient.connect(mongoUrl)
                 }
 
                 // En el evento 'actualizar-sensor' del servidor
-                if (tipo === 'agua' && valor < umbrales.agua) {  // Si hay menos de 100ml de agua
+                if (tipo === 'agua' && valor < umbrales.agua) {
                     estado.Aspersores = 'Encendido';
                     io.emit('actualizacion-actuador', { actuador: 'Aspersores', estadoNuevo: estado.Aspersores });
                     io.emit('alarma', 'Nivel de agua bajo: Aspersores encendidos automáticamente');
                     
-                    // Si tienes configurado Telegram
+                    // Enviar el mensaje a Telegram
                     bot.sendMessage(chatId, '💧 ALERTA: Nivel de agua bajo, aspersores activados');
                 }
 

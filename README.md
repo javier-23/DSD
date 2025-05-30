@@ -1,7 +1,9 @@
-# DSD ☁️
-Prácticas de la asignatura Desarrollo de Sistemas Distribuidos.
+<div align="center">
+    <h1>DSD ☁️ </h1>
+    <p>Prácticas de la asignatura Desarrollo de Sistemas Distribuidos</p>
+</div>
 
-## :one: Práctica RPC
+## :one: Práctica RPC 
 <p align="justify">
 Implementación de programas distribuidos con llamadas a procedimientos remotos RPC. Para ello se desarrollará en esta práctica una calculadora distribuido con cliente y servidor utilizando las distintas funcionalidades que ofrece Sum RPC.
 </p>
@@ -10,7 +12,9 @@ Implementación de programas distribuidos con llamadas a procedimientos remotos 
 La calculadora implementada resuelve operaciones básicas como suma, resta, multiplicación y división, y operaciones más complejas con vectores (suma, resta y producto escalar) y con matrices (suma, resta y multiplicación).
 </p>
 
-> [Código práctica RPC](https://github.com/javier-23/DSD/tree/06ee78666559a2578d748e762c113f442b51fc67/P2 "Código práctica")
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-plain.svg" height="40" alt="c logo"  />
+
+>[Código práctica RPC](https://github.com/javier-23/DSD/tree/06ee78666559a2578d748e762c113f442b51fc67/P2 "Código práctica")
 
 ## 2️⃣ Práctica Apache Thrift
 <p align="justify">
@@ -18,6 +22,8 @@ Realizar una calculadora distribuida, usando las funcionalidades de Apache Thrif
 
 El lenguaje que se utiliza es Python, y para la solución se han implementado un cliente y dos servidores, uno para las operaciones más sencillas,, el cual será el cliente del segundo, y el segundo servidor que hará las operaciones con vectores y matrices.
 </p>
+
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original-wordmark.svg" height="40" alt="python logo"  />
 
 >[Código práctica Apache Thrift](https://github.com/javier-23/DSD/tree/3647db5ecfaeb9fd5fbcd2207f9f9fafbe90f3f7/P3)
 
@@ -47,6 +53,8 @@ El cliente es un aplicación normal de Java que realiza las siguientes acciones:
     - Un cliente no podrá registrarse más de una vez, ni siquiera en replicas distintas.
     - Los servidores también ofrecerán dos operaciones de consulta: total donado y listado de donantes. Dichas operaciones sólo podrán llevarse a cabo si el cliente previamente se ha registrado y ha realizado al menos un depósito. Cuando un cliente realice alguna de estas consultas, sólo hará la petición a la réplica donde se encuentra registrado, y ésta será la encargada de devolver el resultado después de solicitar la información oportuna a la otra replica.
 
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original-wordmark.svg" height="40" alt="java logo"  />
+
 >[Servidor replicado de donaciones](https://github.com/javier-23/DSD/tree/701f26e3b44501268ee475bfc9def5dd24931953/P4/Ejercicio)
 
 </p>
@@ -62,6 +70,8 @@ Para el ejercicio final se implementará un sistema domótico, el cual tiene las
 - Sus respectivos actuadores: persianas, aire acondicionado y aspersores.
 - Un servidor que muestra las páginas para mostrar el estado y actaur sobre los elementos.
 - Un agente para notificar alarmas y tomar decisiones.
+
+![](https://github.com/javier-23/DSD/blob/96226cfef98349203914a799f7e0264527720474/P5-Nodejs/img/sistemaDomotico.png)
 
 En concreto, el sistema se comporta de la siguiente manera:
 
@@ -93,6 +103,8 @@ Implementa las siguientes reglas:
 El sistema utiliza comunicación en tiempo real mediante Socket.IO, permitiendo que todos los dispositivos conectados reciban actualizaciones instantáneas y que el agente responda inmediatamente a los cambios en las condiciones monitorizadas.
 
 Además hace uso de un bot de Telegram para que cada vez que salta una alarma, llega un mensaje a un chat creado con el bot.
+
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original-wordmark.svg" height="40" alt="nodejs logo"  /> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-plain-wordmark.svg" height="40" alt="mongodb logo"  />
 
 >[Sistema Domótico](https://github.com/javier-23/DSD/tree/701f26e3b44501268ee475bfc9def5dd24931953/P5-Nodejs/Ejercicio)
 
